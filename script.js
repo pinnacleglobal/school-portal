@@ -1,6 +1,7 @@
 const SHEET_ID = "1TBykyZx-eRMBDrRGBGGA8p_49iHlVDKN3wt9wijHJWM";
 const API_KEY = "AIzaSyB5VIy4kIySW7bVrjNYMpL5rkqZ7Oe758E";
 
+// Fetch sheet data
 async function getSheetData(sheetName){
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${sheetName}?key=${API_KEY}`;
   const response = await fetch(url);
@@ -45,18 +46,22 @@ async function getStudentData(code){
     }
   }
 
-  // Fees Collection
- // Remove empty or "No" values
-for(let i=1;i<feesData.length;i++){
-  if(feesData[i][2] && feesData[i][2].trim() === admissionNumber){
-    // Tuition
-    if(feesData[i][8] && feesData[i][8].trim().toLowerCase() !== "no") tuition.push(feesData[i][8].trim());
-    // Transport
-    if(feesData[i][9] && feesData[i][9].trim().toLowerCase() !== "no") transport.push(feesData[i][9].trim());
-    // Exam
-    if(feesData[i][10] && feesData[i][10].trim().toLowerCase() !== "no") exam.push(feesData[i][10].trim());
+  // Fees Collection: Tuition, Transport, Exam
+  for(let i=1;i<feesData.length;i++){
+    if(feesData[i][2] && feesData[i][2].trim() === admissionNumber){
+      // Tuition
+      if(feesData[i][8] && feesData[i][8].trim().toLowerCase() !== "no") tuition.push(feesData[i][8].trim());
+      // Transport
+      if(feesData[i][9] && feesData[i][9].trim().toLowerCase() !== "no") transport.push(feesData[i][9].trim());
+      // Exam
+      if(feesData[i][10] && feesData[i][10].trim().toLowerCase() !== "no") exam.push(feesData[i][10].trim());
+    }
   }
-}
+
+  // Replace empty arrays with "NA"
+  if(tuition.length === 0) tuition.push("NA");
+  if(transport.length === 0) transport.push("NA");
+  if(exam.length === 0) exam.push("NA");
 
   return {
     admissionNumber,
