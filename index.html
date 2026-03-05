@@ -6,17 +6,27 @@
 <title>Pinnacle Global School Portal</title>
 <link rel="stylesheet" href="style.css">
 <style>
-body { font-family: Arial; margin:0; padding:0; text-align:center; background:#f4f4f4; }
-.container { max-width:600px; margin:auto; padding:20px; background:white; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1); margin-top:50px;}
-input { padding:10px; width:90%; max-width:250px; margin:10px 0; border-radius:4px; border:1px solid #ccc; }
-button { padding:10px 20px; margin-top:10px; cursor:pointer; border:none; background:#3498db; color:white; border-radius:4px; font-size:16px; }
+body { font-family: Arial, sans-serif; margin:0; padding:0; text-align:center; background:#f4f4f4; }
+.container { max-width:700px; margin:auto; padding:20px; background:white; border-radius:10px; box-shadow:0 0 15px rgba(0,0,0,0.1); margin-top:50px;}
+input { padding:12px; width:90%; max-width:250px; margin:10px 0; border-radius:5px; border:1px solid #ccc; font-size:16px; }
+button { padding:12px 25px; margin-top:10px; cursor:pointer; border:none; background:#3498db; color:white; border-radius:5px; font-size:16px; }
 button:disabled { background:#ccc; cursor:not-allowed; }
-p { font-size:16px; text-align:left; }
+p { font-size:16px; margin:5px 0; text-align:left; }
 .hidden { display:none; }
 .logo { width:120px; margin-bottom:15px; }
 #loader { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); display:flex; justify-content:center; align-items:center; z-index:9999; display:none; }
 .spinner { border:6px solid #f3f3f3; border-top:6px solid #3498db; border-radius:50%; width:50px; height:50px; animation: spin 1s linear infinite; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* Dashboard table */
+table { width:100%; border-collapse: collapse; margin-top:20px; }
+th, td { padding:12px; border:1px solid #ddd; text-align:left; font-size:16px; }
+th { background:#3498db; color:white; }
+@media (max-width:600px){
+  .container { padding:15px; margin-top:30px; }
+  th, td { font-size:14px; padding:8px; }
+  input { width:100%; }
+}
 </style>
 </head>
 <body>
@@ -41,9 +51,27 @@ p { font-size:16px; text-align:left; }
     <p><b>Admission Number :</b> <span id="admission"></span></p>
     <p><b>Student Name :</b> <span id="name"></span></p>
     <p><b>Class :</b> <span id="class"></span></p>
-    <p><b>Tuition Fees paid for months :</b> <span id="tuition"></span></p>
-    <p><b>Transport Fees paid for months :</b> <span id="transport"></span></p>
-    <p><b>Exam Fees paid for months :</b> <span id="exam"></span></p>
+
+    <!-- Fees Table -->
+    <table>
+      <tr>
+        <th>Fees Type</th>
+        <th>Months Paid</th>
+      </tr>
+      <tr>
+        <td>Tuition Fees</td>
+        <td id="tuition"></td>
+      </tr>
+      <tr>
+        <td>Transport Fees</td>
+        <td id="transport"></td>
+      </tr>
+      <tr>
+        <td>Exam Fees</td>
+        <td id="exam"></td>
+      </tr>
+    </table>
+
     <br>
     <button onclick="logout()">Logout</button>
   </div>
