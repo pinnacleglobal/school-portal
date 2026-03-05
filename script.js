@@ -46,13 +46,17 @@ async function getStudentData(code){
   }
 
   // Fees Collection
-  for(let i=1;i<feesData.length;i++){
-    if(feesData[i][2] && feesData[i][2].trim() === admissionNumber){
-      if(feesData[i][8]) tuition.push(feesData[i][8]);   // Column I
-      if(feesData[i][9]) transport.push(feesData[i][9]); // Column J
-      if(feesData[i][10]) exam.push(feesData[i][10]);    // Column K
-    }
+ // Remove empty or "No" values
+for(let i=1;i<feesData.length;i++){
+  if(feesData[i][2] && feesData[i][2].trim() === admissionNumber){
+    // Tuition
+    if(feesData[i][8] && feesData[i][8].trim().toLowerCase() !== "no") tuition.push(feesData[i][8].trim());
+    // Transport
+    if(feesData[i][9] && feesData[i][9].trim().toLowerCase() !== "no") transport.push(feesData[i][9].trim());
+    // Exam
+    if(feesData[i][10] && feesData[i][10].trim().toLowerCase() !== "no") exam.push(feesData[i][10].trim());
   }
+}
 
   return {
     admissionNumber,
