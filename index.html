@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pinnacle Global School Portal</title>
-<link rel="stylesheet" href="style.css">
 <style>
 body { font-family: Arial, sans-serif; margin:0; padding:0; text-align:center; background:#f4f4f4; }
 .container { max-width:700px; margin:auto; padding:20px; background:white; border-radius:10px; box-shadow:0 0 15px rgba(0,0,0,0.1); margin-top:50px;}
@@ -19,9 +18,10 @@ p { font-size:16px; margin:5px 0; text-align:left; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
 /* Dashboard table */
-table { width:100%; border-collapse: collapse; margin-top:20px; }
-th, td { padding:12px; border:1px solid #ddd; text-align:left; font-size:16px; }
+table { width:100%; border-collapse: collapse; margin-top:20px; background:#fdfdfd; }
+th, td { padding:12px; border:1px solid #3498db; text-align:left; font-size:16px; }
 th { background:#3498db; color:white; }
+td { background:#f9f9f9; }
 @media (max-width:600px){
   .container { padding:15px; margin-top:30px; }
   th, td { font-size:14px; padding:8px; }
@@ -48,8 +48,8 @@ th { background:#3498db; color:white; }
   <div id="dashboardSection" class="hidden">
     <img src="images/logo.png" class="logo">
     <h2>Pinnacle Global School</h2>
+    <h3 id="welcomeMessage"></h3>
     <p><b>Admission Number :</b> <span id="admission"></span></p>
-    <p><b>Student Name :</b> <span id="name"></span></p>
     <p><b>Class :</b> <span id="class"></span></p>
 
     <!-- Fees Table -->
@@ -82,5 +82,29 @@ th { background:#3498db; color:white; }
 <div id="loader"><div class="spinner"></div></div>
 
 <script src="script.js"></script>
+<script>
+// Update welcome message in dashboard
+function showDashboard(data){
+  document.getElementById("loginSection").classList.add("hidden");
+  document.getElementById("dashboardSection").classList.remove("hidden");
+
+  document.getElementById("welcomeMessage").innerText = "Welcome, " + data.studentName;
+
+  document.getElementById("admission").innerText = data.admissionNumber || "";
+  document.getElementById("class").innerText = data.studentClass || "";
+  document.getElementById("tuition").innerText = data.tuition || "";
+  document.getElementById("transport").innerText = data.transport || "";
+  document.getElementById("exam").innerText = data.exam || "";
+}
+
+// Logout button click
+function logout(){
+  document.getElementById("dashboardSection").classList.add("hidden");
+  document.getElementById("loginSection").classList.remove("hidden");
+  document.getElementById("code").value="";
+  document.getElementById("message").innerText="";
+}
+</script>
+
 </body>
 </html>
