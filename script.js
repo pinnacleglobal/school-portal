@@ -50,18 +50,23 @@ async function getStudentData(code){
   for(let i=1;i<feesData.length;i++){
     if(feesData[i][2] && feesData[i][2].trim() === admissionNumber){
       // Tuition
-      if(feesData[i][8] && feesData[i][8].trim().toLowerCase() !== "no") tuition.push(feesData[i][8].trim());
+      let tuitionValue = feesData[i][8] ? feesData[i][8].trim() : "";
+      if(tuitionValue && tuitionValue.toLowerCase() !== "no") tuition.push(tuitionValue);
+
       // Transport
-      if(feesData[i][9] && feesData[i][9].trim().toLowerCase() !== "no") transport.push(feesData[i][9].trim());
+      let transportValue = feesData[i][9] ? feesData[i][9].trim() : "";
+      if(transportValue && transportValue.toLowerCase() !== "no") transport.push(transportValue);
+
       // Exam
-      if(feesData[i][10] && feesData[i][10].trim().toLowerCase() !== "no") exam.push(feesData[i][10].trim());
+      let examValue = feesData[i][10] ? feesData[i][10].trim() : "";
+      if(examValue && examValue.toLowerCase() !== "no") exam.push(examValue);
     }
   }
 
   // Replace empty arrays with "NA"
-  if(tuition.length === 0) tuition.push("NA");
-  if(transport.length === 0) transport.push("NA");
-  if(exam.length === 0) exam.push("NA");
+  tuition = tuition.length > 0 ? tuition : ["NA"];
+  transport = transport.length > 0 ? transport : ["NA"];
+  exam = exam.length > 0 ? exam : ["NA"];
 
   return {
     admissionNumber,
