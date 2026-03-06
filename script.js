@@ -67,10 +67,8 @@ window.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      const feeTableEl = document.getElementById("feeTable");
-      const feeCardsEl = document.getElementById("feeCards");
-      if(feeTableEl) feeTableEl.innerHTML = tableHTML;
-      if(feeCardsEl) feeCardsEl.innerHTML = cardsHTML;
+      document.getElementById("feeTable").innerHTML = tableHTML;
+      document.getElementById("feeCards").innerHTML = cardsHTML;
 
       document.getElementById("loginBox").style.display="none";
       document.getElementById("portal").style.display="block";
