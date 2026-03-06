@@ -8,10 +8,6 @@
 <!-- Favicon -->
 <link rel="icon" href="images/logo.png">
 
-<!-- PWA manifest -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0b3d91">
-
 <style>
 body{font-family:Arial;margin:0;background:#f2f5ff;}
 .header{background:#0b3d91;text-align:center;padding:20px;color:white;}
@@ -38,8 +34,6 @@ tr:nth-child(even){background:#e8f1ff;}
   .fee-cards{display:block;}
 }
 .logout{text-align:center;margin:20px;}
-
-/* Splash Screen */
 #splash{position:fixed;top:0;left:0;right:0;bottom:0;background:#0b3d91;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:9999;color:white;}
 #splash img{width:120px;margin-bottom:15px;}
 </style>
@@ -105,29 +99,11 @@ tr:nth-child(even){background:#e8f1ff;}
 <script src="script.js" defer></script>
 
 <script>
-// Show splash briefly, then login page
 window.addEventListener('load', ()=>{
     setTimeout(()=>{
         document.getElementById('splash').style.display='none';
         document.getElementById('loginBox').style.display='block';
     }, 1000);
-});
-
-// Install button for Android
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e)=>{
-  e.preventDefault();
-  deferredPrompt=e;
-  const btn=document.createElement('button');
-  btn.innerText="Install Portal App";
-  btn.style.cssText="padding:12px 20px;font-size:16px;margin:15px;cursor:pointer;";
-  document.body.insertBefore(btn,document.body.firstChild);
-  btn.addEventListener('click', async ()=>{
-    btn.style.display='none';
-    deferredPrompt.prompt();
-    const {outcome} = await deferredPrompt.userChoice;
-    deferredPrompt=null;
-  });
 });
 </script>
 
