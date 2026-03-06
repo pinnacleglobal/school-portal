@@ -1,5 +1,5 @@
 const sheetID="1TBykyZx-eRMBDrRGBGGA8p_49iHlVDKN3wt9wijHJWM";
-const apiKey="AIzaSyB5VIy4kIySW7bVrjNYMpL5rkqZ7Oe758E";
+const apiKey="AIzaSyB5VIy4kIySW7bVrjNYMpL5rkqZ7Oe758E"; // replace with your key
 
 const masterSheet="Master Data 25 (New)";
 const feesSheet="Fees Collection";
@@ -11,26 +11,25 @@ async function login(){
 
   document.getElementById("loginBtn").disabled=true;
   document.getElementById("loader").style.display="block";
+  document.getElementById("splash").style.display="flex"; // mini splash while loading
 
   try{
-    // Fetch AW sheet
-    const awResp = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${awSheet}?key=${apiKey}`);
-    const awData = await awResp.json();
-    const awRows = awData.values;
+    // Fetch AW
+    const awResp=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${awSheet}?key=${apiKey}`);
+    const awData=await awResp.json();
+    const awRows=awData.values;
 
-    // Find student
-    let studentRow = null;
+    let studentRow=null;
     for(let i=1;i<awRows.length;i++){
       if(awRows[i][29] && awRows[i][29].trim()===code){
-        studentRow=awRows[i];
-        break;
+        studentRow=awRows[i]; break;
       }
     }
-
     if(!studentRow){
       alert("Invalid Login Code");
       document.getElementById("loader").style.display="none";
       document.getElementById("loginBtn").disabled=false;
+      document.getElementById("splash").style.display="none";
       return;
     }
 
@@ -41,10 +40,10 @@ async function login(){
     const phone=studentRow[22];
     const address=studentRow[7];
 
-    // Fetch Master sheet for class
-    const masterResp = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${masterSheet}?key=${apiKey}`);
-    const masterData = await masterResp.json();
-    const masterRows = masterData.values;
+    // Fetch Master sheet
+    const masterResp=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${masterSheet}?key=${apiKey}`);
+    const masterData=await masterResp.json();
+    const masterRows=masterData.values;
     let studentClass="";
     for(let i=1;i<masterRows.length;i++){
       if(masterRows[i][1]==admission){ studentClass=masterRows[i][13]; break; }
@@ -60,13 +59,13 @@ async function login(){
     document.getElementById("address").innerText="Address : "+address;
 
     // Fetch Fees
-    const feesResp = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${feesSheet}?key=${apiKey}`);
-    const feesData = await feesResp.json();
-    const feeRows = feesData.values;
+    const feesResp=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${feesSheet}?key=${apiKey}`);
+    const feesData=await feesResp.json();
+    const feeRows=feesData.values;
 
-    const isMobile = window.innerWidth<=600;
-    document.getElementById("feeTable").style.display = isMobile ? "none":"table";
-    document.getElementById("feeCards").style.display = isMobile ? "block":"none";
+    const isMobile=window.innerWidth<=600;
+    document.getElementById("feeTable").style.display=isMobile?"none":"table";
+    document.getElementById("feeCards").style.display=isMobile?"block":"none";
 
     let table="", cards="";
     for(let i=1;i<feeRows.length;i++){
@@ -105,15 +104,14 @@ async function login(){
     document.getElementById("loginBox").style.display="none";
     document.getElementById("portal").style.display="block";
     document.getElementById("loader").style.display="none";
-
-    // Hide splash after data loaded
-    document.getElementById('splash').style.display='none';
+    document.getElementById("splash").style.display="none";
 
   }catch(err){
     console.error(err);
     alert("Error loading data");
     document.getElementById("loader").style.display="none";
     document.getElementById("loginBtn").disabled=false;
+    document.getElementById("splash").style.display="none";
   }
 }
 
