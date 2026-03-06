@@ -8,6 +8,9 @@
 <!-- Favicon -->
 <link rel="icon" href="images/logo.png">
 
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+
 <style>
 body{font-family:Arial;margin:0;background:#f2f5ff;}
 .header{background:#0b3d91;text-align:center;padding:20px;color:white;}
@@ -36,6 +39,7 @@ tr:nth-child(even){background:#e8f1ff;}
 .logout{text-align:center;margin:20px;}
 #splash{position:fixed;top:0;left:0;right:0;bottom:0;background:#0b3d91;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:9999;color:white;}
 #splash img{width:120px;margin-bottom:15px;}
+#installBtn{display:none;padding:10px 15px;margin:10px;background:#0b3d91;color:white;border:none;border-radius:6px;cursor:pointer;}
 </style>
 </head>
 
@@ -93,11 +97,13 @@ tr:nth-child(even){background:#e8f1ff;}
   <!-- Mobile Cards -->
   <div class="fee-cards" id="feeCards"></div>
 
+  <!-- PWA Install Button -->
+  <button id="installBtn">Install App</button>
+
   <div class="logout"><button onclick="logout()">Logout</button></div>
 </div>
 
 <script src="script.js" defer></script>
-
 <script>
 window.addEventListener('load', ()=>{
     setTimeout(()=>{
