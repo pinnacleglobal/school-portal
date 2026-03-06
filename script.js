@@ -1,30 +1,27 @@
 const sheetID = "1TBykyZx-eRMBDrRGBGGA8p_49iHlVDKN3wt9wijHJWM";
-const apiKey = "AIzaSyB5VIy4kIySW7bVrjNYMpL5rkqZ7Oe758E"; // Replace with your key
-
+const apiKey = "AIzaSyB5VIy4kIySW7bVrjNYMpL5rkqZ7Oe758E"; // Replace with your API key
 const masterSheet = "Master Data 25 (New)";
 const feesSheet = "Fees Collection";
 const awSheet = "AW";
 
-let deferredPrompt; // for PWA install
+let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt', (e)=>{
   e.preventDefault();
   deferredPrompt = e;
-  const btn = document.getElementById('installBtn');
-  if(btn) btn.style.display='inline-block';
+  document.getElementById('installBtn').style.display='inline-block';
 });
 
 document.getElementById('installBtn')?.addEventListener('click', async ()=>{
   if(deferredPrompt){
     deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
-    console.log('PWA choice', choice);
-    deferredPrompt = null;
+    await deferredPrompt.userChoice;
+    deferredPrompt=null;
     document.getElementById('installBtn').style.display='none';
   }
 });
 
-async function login() {
+async function login(){
   const code = document.getElementById("loginCode")?.value.trim();
   if(!code){ alert("Enter Login Code"); return; }
 
@@ -32,7 +29,7 @@ async function login() {
   document.getElementById("loader").style.display = "block";
   document.getElementById("splash").style.display = "flex";
 
-  try {
+  try{
     const awData = await fetchSheet(awSheet);
     const studentRow = awData.find(r=>r[29]?.trim()===code);
     if(!studentRow){ alert("Invalid Login Code"); resetLogin(); return; }
@@ -48,31 +45,27 @@ async function login() {
     const masterRow = masterData.find(r=>r[1]===admission);
     const studentClass = masterRow?.[13]||"NA";
 
-    setText("studentName", "Welcome, " + studentName);
-    setText("class", "Class : " + studentClass);
-    setText("adm", "Admission No : " + admission);
-    setText("father", "Father's Name : " + father);
-    setText("mother", "Mother's Name : " + mother);
-    setText("phone", "Phone Number : " + phone);
-    setText("address", "Address : " + address);
+    setText("studentName","Welcome, "+studentName);
+    setText("class","Class : "+studentClass);
+    setText("adm","Admission No : "+admission);
+    setText("father","Father's Name : "+father);
+    setText("mother","Mother's Name : "+mother);
+    setText("phone","Phone Number : "+phone);
+    setText("address","Address : "+address);
 
     const feeData = await fetchSheet(feesSheet);
-
-    let tableHTML = "", cardsHTML = "";
-    const feeTableEl = document.getElementById("feeTable");
-    const feeCardsEl = document.getElementById("feeCards");
-    const isMobile = window.innerWidth <= 600;
+    let tableHTML="", cardsHTML="";
 
     feeData.slice(1).forEach(row=>{
-      if(row[2] === admission){
+      if(row[2]===admission){
         const [r0,r1,r5,r6,r7,r8,r9,r10] = [row[0]||"",row[1]||"",row[5]||"",row[6]||"",row[7]||"",row[8]||"",row[9]||"",row[10]||""];
         tableHTML += `<tr><td>${r1}</td><td>${r0}</td><td>${r5}</td><td>${r6}</td><td>${r7}</td><td>${r8}</td><td>${r9}</td><td>${r10}</td></tr>`;
         cardsHTML += `<div class="fee-card"><div><b>Date:</b> ${r1}</div><div><b>Slip No:</b> ${r0}</div><div><b>Amount:</b> ${r5}</div><div><b>Fee Type:</b> ${r6}</div><div><b>Session:</b> ${r7}</div><div><b>Tuition:</b> ${r8}</div><div><b>Transport:</b> ${r9}</div><div><b>Exam:</b> ${r10}</div></div>`;
       }
     });
 
-    if(feeTableEl?.querySelector("tbody")) feeTableEl.querySelector("tbody").innerHTML = tableHTML;
-    if(feeCardsEl) feeCardsEl.innerHTML = cardsHTML;
+    document.getElementById("feeTable").querySelector("tbody").innerHTML = tableHTML;
+    document.getElementById("feeCards").innerHTML = cardsHTML;
 
     document.getElementById("loginBox").style.display="none";
     document.getElementById("portal").style.display="block";
