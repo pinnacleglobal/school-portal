@@ -1,5 +1,5 @@
 const sheetID = "1TBykyZx-eRMBDrRGBGGA8p_49iHlVDKN3wt9wijHJWM";
-const apiKey = "AIzaSyB5VIy4kIySW7bVrjNYMpL5rkqZ7Oe758E"; // Replace with your Google Sheets API key
+const apiKey = "AIzaSyB5VIy4kIySW7bVrjNYMpL5rkqZ7Oe758E"; // Replace with your API key
 const masterSheet = "Master Data 25 (New)";
 const feesSheet = "Fees Collection";
 const awSheet = "AW";
