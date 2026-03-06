@@ -1,125 +1,164 @@
-const SHEET_ID = "1TBykyZx-eRMBDrRGBGGA8p_49iHlVDKN3wt9wijHJWM";
-const API_KEY = "AIzaSyB5VIy4kIySW7bVrjNYMpL5rkqZ7Oe758E";
+const sheetID = "1TBykyZx-eRMBDrRGBGGA8p_49iHlVDKN3wt9wijHJWM";
+const apiKey = "AIzaSyB5VIy4kIySW7bVrjNYMpL5rkqZ7Oe758E";
 
-// Fetch sheet data
-async function getSheetData(sheetName){
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${sheetName}?key=${API_KEY}`;
-  const response = await fetch(url);
-  const data = await response.json();
-  return data.values; // 2D array of rows
-}
+const masterSheet = "Master Data 25 (New)";
+const feesSheet = "Fees Collection";
+const awSheet = "AW";
 
-// Check login code
-async function checkLogin(code){
-  const awData = await getSheetData("AW");
-  for(let i=1;i<awData.length;i++){
-    if(awData[i][29] && awData[i][29].trim() === code.trim()){
-      return true;
-    }
-  }
-  return false;
-}
-
-// Get student info
-async function getStudentData(code){
-  const awData = await getSheetData("AW");
-  const masterData = await getSheetData("Master Data 25 (New)");
-  const feesData = await getSheetData("Fees Collection");
-
-  let admissionNumber="", studentName="", studentClass="";
-  let tuition=[], transport=[], exam=[];
-
-  // AW sheet: Admission No & Name
-  for(let i=1;i<awData.length;i++){
-    if(awData[i][29] && awData[i][29].trim() === code.trim()){
-      admissionNumber = awData[i][1]; // Column B
-      studentName = awData[i][3];     // Column D
-      break;
-    }
-  }
-
-  // Master Data: Class
-  for(let i=1;i<masterData.length;i++){
-    if(masterData[i][1] && masterData[i][1].trim() === admissionNumber){
-      studentClass = masterData[i][13]; // Column N
-      break;
-    }
-  }
-
-  // Fees Collection: Tuition, Transport, Exam
-  for(let i=1;i<feesData.length;i++){
-    if(feesData[i][2] && feesData[i][2].trim() === admissionNumber){
-      // Tuition
-      let tuitionValue = feesData[i][8] ? feesData[i][8].trim() : "";
-      if(tuitionValue && tuitionValue.toLowerCase() !== "no") tuition.push(tuitionValue);
-
-      // Transport
-      let transportValue = feesData[i][9] ? feesData[i][9].trim() : "";
-      if(transportValue && transportValue.toLowerCase() !== "no") transport.push(transportValue);
-
-      // Exam
-      let examValue = feesData[i][10] ? feesData[i][10].trim() : "";
-      if(examValue && examValue.toLowerCase() !== "no") exam.push(examValue);
-    }
-  }
-
-  // Replace empty arrays with "NA"
-  tuition = tuition.length > 0 ? tuition : ["NA"];
-  transport = transport.length > 0 ? transport : ["NA"];
-  exam = exam.length > 0 ? exam : ["NA"];
-
-  return {
-    admissionNumber,
-    studentName,
-    studentClass,
-    tuition: tuition.join(", "),
-    transport: transport.join(", "),
-    exam: exam.join(", ")
-  };
-}
-
-// Login button click
 async function login(){
-  const code = document.getElementById("code").value.trim();
-  const loginBtn = document.querySelector("#loginSection button");
-  if(code===""){document.getElementById("message").innerText="Enter login code"; return;}
 
-  loginBtn.disabled=true;
-  document.getElementById("loader").style.display="flex";
+const code = document.getElementById("loginCode").value.trim();
 
-  try{
-    const valid = await checkLogin(code);
-    if(valid){
-      const data = await getStudentData(code);
-      showDashboard(data);
-    }else{
-      document.getElementById("message").innerText="Invalid Code!";
-    }
-  }catch(err){
-    alert("Error: "+err.message);
-  }
-
-  loginBtn.disabled=false;
-  document.getElementById("loader").style.display="none";
+if(code==""){
+alert("Enter Login Code");
+return;
 }
 
-// Display dashboard
-function showDashboard(data){
-  document.getElementById("loginSection").classList.add("hidden");
-  document.getElementById("dashboardSection").classList.remove("hidden");
+document.getElementById("loginBtn").disabled = true;
+document.getElementById("loader").style.display = "block";
 
-  document.getElementById("admission").innerText = data.admissionNumber || "";
-  document.getElementById("name").innerText = data.studentName || "";
-  document.getElementById("class").innerText = data.studentClass || "";
-  document.getElementById("tuition").innerText = data.tuition || "";
-  document.getElementById("transport").innerText = data.transport || "";
-  document.getElementById("exam").innerText = data.exam || "";
+try{
+
+/* FETCH AW SHEET */
+
+const awURL = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${awSheet}?key=${apiKey}`;
+
+const awResp = await fetch(awURL);
+const awData = await awResp.json();
+const awRows = awData.values || [];
+
+let admission="";
+let studentName="";
+let father="";
+let mother="";
+let phone="";
+let address="";
+
+for(let i=1;i<awRows.length;i++){
+
+if(awRows[i][29] && awRows[i][29].trim()==code){
+
+admission = awRows[i][1] || "NA";
+studentName = awRows[i][3] || "NA";
+father = awRows[i][6] || "NA";
+mother = awRows[i][5] || "NA";
+phone = awRows[i][22] || "NA";
+address = awRows[i][7] || "NA";
+
+break;
+
 }
 
-// Logout button click
+}
+
+if(admission==""){
+alert("Invalid Login Code");
+document.getElementById("loader").style.display="none";
+document.getElementById("loginBtn").disabled=false;
+return;
+}
+
+/* FETCH MASTER DATA */
+
+const masterURL = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${masterSheet}?key=${apiKey}`;
+
+const masterResp = await fetch(masterURL);
+const masterData = await masterResp.json();
+const masterRows = masterData.values || [];
+
+let studentClass="NA";
+
+for(let i=1;i<masterRows.length;i++){
+
+if(masterRows[i][1]==admission){
+studentClass = masterRows[i][13] || "NA";
+break;
+}
+
+}
+
+/* FILL PROFILE */
+
+document.getElementById("studentName").innerText = "Welcome, "+studentName;
+document.getElementById("class").innerText = "Class : "+studentClass;
+document.getElementById("adm").innerText = "Admission No : "+admission;
+document.getElementById("father").innerText = "Father's Name : "+father;
+document.getElementById("mother").innerText = "Mother's Name : "+mother;
+document.getElementById("phone").innerText = "Phone Number : "+phone;
+document.getElementById("address").innerText = "Address : "+address;
+
+/* FETCH FEES DATA */
+
+const feesURL = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${feesSheet}?key=${apiKey}`;
+
+const feesResp = await fetch(feesURL);
+const feesData = await feesResp.json();
+const feeRows = feesData.values || [];
+
+let table="";
+let cards="";
+
+for(let i=1;i<feeRows.length;i++){
+
+if(feeRows[i][2]==admission){
+
+const r0 = feeRows[i][0] || "NA";
+const r1 = feeRows[i][1] || "NA";
+const r5 = feeRows[i][5] || "NA";
+const r6 = feeRows[i][6] || "NA";
+const r7 = feeRows[i][7] || "NA";
+const r8 = feeRows[i][8] || "NA";
+const r9 = feeRows[i][9] || "NA";
+const r10 = feeRows[i][10] || "NA";
+
+table += `<tr>
+<td>${r1}</td>
+<td>${r0}</td>
+<td>${r5}</td>
+<td>${r6}</td>
+<td>${r7}</td>
+<td>${r8}</td>
+<td>${r9}</td>
+<td>${r10}</td>
+</tr>`;
+
+cards += `<div class="fee-card">
+<div><b>Date:</b> ${r1}</div>
+<div><b>Slip No:</b> ${r0}</div>
+<div><b>Amount:</b> ${r5}</div>
+<div><b>Fee Type:</b> ${r6}</div>
+<div><b>Session:</b> ${r7}</div>
+<div><b>Tuition Months:</b> ${r8}</div>
+<div><b>Transport Months:</b> ${r9}</div>
+<div><b>Exam Months:</b> ${r10}</div>
+</div>`;
+
+}
+
+}
+
+/* INSERT DATA */
+
+document.getElementById("feeTable").innerHTML = table;
+document.getElementById("feeCards").innerHTML = cards;
+
+/* SHOW DASHBOARD */
+
+document.getElementById("loginBox").style.display="none";
+document.getElementById("loader").style.display="none";
+document.getElementById("portal").style.display="block";
+
+}catch(error){
+
+console.error(error);
+alert("Error loading data: "+error.message);
+document.getElementById("loader").style.display="none";
+document.getElementById("loginBtn").disabled=false;
+
+}
+
+}
+
 function logout(){
-  document.getElementById("dashboardSection").classList.add("hidden");
-  document.getElementById("loginSection").classList.remove("hidden");
-  document.getElementById("code").value="";
-  document.getElementById("message").innerText="";
+location.reload();
 }
