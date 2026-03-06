@@ -1,11 +1,10 @@
 {
   "name": "Student Fee Portal",
-  "short_name": "Fee Portal",
+  "short_name": "FeePortal",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#0b3d91",
   "theme_color": "#0b3d91",
-  "orientation": "portrait",
   "icons": [
     {
       "src": "images/logo.png",
