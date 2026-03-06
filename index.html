@@ -14,12 +14,15 @@
 <style>
 body { font-family: Arial; margin: 0; background: #f2f5ff; }
 
-/* Top Install Header */
+/* Top Install Header (Sticky) */
 .install-header {
     background: white;
     padding: 10px;
     text-align: left;
     border-bottom: 1px solid #ccc;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 #installBtn {
     padding: 10px 15px;
@@ -77,7 +80,7 @@ tr:nth-child(even) { background: #e8f1ff; }
 </head>
 <body>
 
-<!-- Top Install App Header -->
+<!-- Sticky Top Install App Header -->
 <div class="install-header">
     <button id="installBtn">Install App</button>
 </div>
