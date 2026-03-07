@@ -77,18 +77,12 @@ margin:auto;
 }
 
 .profile{
-text-align:center;
+text-align:left;
 background:white;
 margin:15px;
 padding:25px;
 border-radius:10px;
 box-shadow:0 2px 6px rgba(0,0,0,0.1);
-}
-
-.student-name{
-font-size:22px;
-font-weight:bold;
-margin-bottom:10px;
 }
 
 .info{
@@ -207,12 +201,15 @@ Loading Student Data...
 
 <div id="portal" style="display:none">
 
+<div class="section-title">
+Student Details
+</div>
+
 <div class="profile">
 
-<div class="student-name" id="studentName"></div>
-
-<div class="info"><span class="label">Class :</span> <span id="class"></span></div>
+<div class="info"><span class="label">Student Name :</span> <span id="studentName"></span></div>
 <div class="info"><span class="label">Admission Number :</span> <span id="adm"></span></div>
+<div class="info"><span class="label">Class :</span> <span id="class"></span></div>
 <div class="info"><span class="label">Father's Name :</span> <span id="father"></span></div>
 <div class="info"><span class="label">Mother's Name :</span> <span id="mother"></span></div>
 <div class="info"><span class="label">Phone Number :</span> <span id="phone"></span></div>
@@ -221,7 +218,7 @@ Loading Student Data...
 </div>
 
 <div class="section-title">
-Fee Details
+Paid Fee Details
 </div>
 
 <div class="table-container">
@@ -249,6 +246,40 @@ Fee Details
 </div>
 
 <div class="fee-cards" id="feeCards"></div>
+
+<div class="section-title">
+Fee Structure
+</div>
+
+<div class="profile">
+
+<div class="info"><span class="label">Monthly Tuition Fees :</span> <span id="monthlyTuition"></span></div>
+
+<div class="info"><span class="label">Tuition Fees for Months :</span> <span id="tuitionMonths"></span></div>
+
+<div class="info"><span class="label">Transport Fees :</span> <span id="transportFees"></span></div>
+
+<div class="info"><span class="label">Transport Fees Months :</span> <span id="transportMonths"></span></div>
+
+<div class="info"><span class="label">Exam Fee (500+500) :</span> 1000</div>
+
+<div class="info"><span class="label">Previous Year Fee Remain :</span> <span id="prevRemain"></span></div>
+
+<div class="info"><span class="label">Discount :</span> <span id="discount"></span></div>
+
+</div>
+
+<div class="section-title">
+Fee Summary
+</div>
+
+<div class="profile">
+
+<div class="info"><span class="label">Total Fees Paid in Current Session :</span> <span id="totalPaid"></span></div>
+
+<div class="info"><span class="label">Fee Balance :</span> <span id="feeBalance"></span></div>
+
+</div>
 
 <div class="logout">
 <button onclick="logout()">Logout</button>
