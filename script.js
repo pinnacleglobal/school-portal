@@ -1,125 +1,176 @@
 const sheetID = "1TBykyZx-eRMBDrRGBGGA8p_49iHlVDKN3wt9wijHJWM";
-const apiKey = "AIzaSyB5VIy4kIySW7bVrjNYMpL5rkqZ7Oe758E"; // Replace with your API Key
+const apiKey = "AIzaSyB5VIy4kIySW7bVrjNYMpL5rkqZ7Oe758E";
+
 const masterSheet = "Master Data 25 (New)";
 const feesSheet = "Fees Collection";
 const awSheet = "AW";
 
 let deferredPrompt;
 
-window.addEventListener('DOMContentLoaded', () => {
-
-  // PWA install
-  window.addEventListener('beforeinstallprompt', (e)=>{
-    e.preventDefault();
-    deferredPrompt = e;
-    document.getElementById('installBtn').style.display='inline-block';
-  });
-
-  document.getElementById('installBtn')?.addEventListener('click', async ()=>{
-    if(deferredPrompt){
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt=null;
-      document.getElementById('installBtn').style.display='none';
-    }
-  });
-
-  window.login = async function login() {
-    const code = document.getElementById("loginCode")?.value.trim();
-    if(!code){ alert("Enter Login Code"); return; }
-
-    document.getElementById("loginBtn").disabled = true;
-    document.getElementById("loader").style.display = "block";
-    document.getElementById("splash").style.display = "flex";
-
-    try{
-      const awData = await fetchSheet(awSheet);
-      const studentRow = awData.find(r=>r[29]?.trim()===code);
-      if(!studentRow){ alert("Invalid Login Code"); resetLogin(); return; }
-
-      const admission = studentRow[1]||"NA";
-      const studentName = studentRow[3]||"NA";
-      const father = studentRow[6]||"NA";
-      const mother = studentRow[5]||"NA";
-      const phone = studentRow[22]||"NA";
-      const address = studentRow[7]||"NA";
-
-      const masterData = await fetchSheet(masterSheet);
-      const masterRow = masterData.find(r=>r[1]===admission);
-      const studentClass = masterRow?.[13]||"NA";
-
-      setText("studentName","Welcome, "+studentName);
-      setText("class",studentClass);
-      setText("adm",admission);
-      setText("father",father);
-      setText("mother",mother);
-      setText("phone",phone);
-      setText("address",address);
-
-      const feeData = await fetchSheet(feesSheet);
-      let tableHTML="", cardsHTML="";
-      let alternate=false;
-
-      feeData.slice(1).forEach(row=>{
-        if(row[2]===admission){
-          const [r0,r1,r5,r6,r7,r8,r9,r10,r11] = [row[0]||"",row[1]||"",row[5]||"",row[6]||"",row[7]||"",row[8]||"",row[9]||"",row[10]||"",row[11]||""];
-
-          // Desktop table
-          tableHTML += `<tr>
-            <td>${r1}</td>
-            <td>${r0}</td>
-            <td>${r5}</td>
-            <td>${r6}</td>
-            <td>${r7}</td>
-            <td>${r8}</td>
-            <td>${r9}</td>
-            <td>${r10}</td>
-            <td>${r11}</td>
-          </tr>`;
-
-          // Mobile fee card
-          cardsHTML += `<div class="fee-card ${alternate?'alt':''}">
-            <div><span class="label">Date:</span> ${r1}</div>
-            <div><span class="label">Slip Number:</span> ${r0}</div>
-            <div><span class="label">Amount Paid:</span> ${r5}</div>
-            <div><span class="label">Fee Type:</span> ${r6}</div>
-            <div><span class="label">Session:</span> ${r7}</div>
-            <div><span class="label">Tuition Fee Months:</span> ${r8}</div>
-            <div><span class="label">Transport Fee Months:</span> ${r9}</div>
-            <div><span class="label">Exam Fee Months:</span> ${r10}</div>
-            <div><span class="label">Payment Mode:</span> ${r11}</div>
-          </div>`;
-          alternate = !alternate;
-        }
-      });
-
-      document.getElementById("feeTable").innerHTML = tableHTML;
-      document.getElementById("feeCards").innerHTML = cardsHTML;
-
-      document.getElementById("loginBox").style.display="none";
-      document.getElementById("portal").style.display="block";
-      document.getElementById("loader").style.display="none";
-      document.getElementById("splash").style.display="none";
-
-    } catch(err){
-      console.error(err);
-      alert("Error loading data: "+err.message);
-      resetLogin();
-    }
-  }
-});
-
-function logout(){ location.reload(); }
-
-async function fetchSheet(sheetName){
-  const resp = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${sheetName}?key=${apiKey}`);
-  const data = await resp.json();
-  return data.values || [];
+/* Detect if app is already installed */
+function isRunningStandalone() {
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true
+  );
 }
 
-function setText(id,text){ const el=document.getElementById(id); if(el) el.innerText=text; }
-function resetLogin(){
-  document.getElementById("loader").style.display="none";
-  document.getElementById("loginBtn").disabled=false;
-  document.getElementById("splash").style.display="none";
+window.addEventListener("DOMContentLoaded", () => {
+
+  const installBtn = document.getElementById("installBtn");
+
+  /* Hide button if already installed */
+  if (isRunningStandalone()) {
+    if (installBtn) installBtn.style.display = "none";
+  }
+
+  /* Show install button when browser allows */
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+
+    if (!isRunningStandalone()) {
+      installBtn.style.display = "inline-block";
+    }
+  });
+
+  /* Install button click */
+  installBtn.addEventListener("click", async () => {
+    if (!deferredPrompt) return;
+
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+
+    if (choice.outcome === "accepted") {
+      installBtn.style.display = "none";
+    }
+
+    deferredPrompt = null;
+  });
+
+});
+
+
+async function login(){
+
+    const code = document.getElementById("loginCode").value.trim();
+
+    if(!code){
+        alert("Enter Login Code");
+        return;
+    }
+
+    document.getElementById("loginBtn").disabled=true;
+    document.getElementById("loader").style.display="block";
+
+    try{
+
+        /* AW sheet login check */
+        const awRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${awSheet}?key=${apiKey}`);
+        const awData = await awRes.json();
+        const awRows = awData.values || [];
+
+        let studentRow = awRows.find(r => r[29]?.trim() === code);
+
+        if(!studentRow){
+            alert("Invalid Login Code");
+            document.getElementById("loader").style.display="none";
+            document.getElementById("loginBtn").disabled=false;
+            return;
+        }
+
+        const admission = studentRow[1];
+        const studentName = studentRow[3];
+        const father = studentRow[6];
+        const mother = studentRow[5];
+        const phone = studentRow[22];
+        const address = studentRow[7];
+
+        /* Master Sheet */
+        const masterRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${masterSheet}?key=${apiKey}`);
+        const masterData = await masterRes.json();
+        const masterRows = masterData.values || [];
+
+        const masterRow = masterRows.find(r => r[1] === admission);
+        const studentClass = masterRow?.[13] || "NA";
+
+        document.getElementById("studentName").innerText="Welcome, "+studentName;
+        document.getElementById("class").innerHTML="<b>Class:</b> "+studentClass;
+        document.getElementById("adm").innerHTML="<b>Admission Number:</b> "+admission;
+        document.getElementById("father").innerHTML="<b>Father's Name:</b> "+father;
+        document.getElementById("mother").innerHTML="<b>Mother's Name:</b> "+mother;
+        document.getElementById("phone").innerHTML="<b>Phone Number:</b> "+phone;
+        document.getElementById("address").innerHTML="<b>Address:</b> "+address;
+
+        /* Fees */
+        const feesRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${feesSheet}?key=${apiKey}`);
+        const feesData = await feesRes.json();
+        const feeRows = feesData.values || [];
+
+        let table="";
+        let cards="";
+
+        for(let i=1;i<feeRows.length;i++){
+
+            const row = feeRows[i];
+
+            if(row[2] === admission){
+
+                const date=row[1]||"";
+                const slip=row[0]||"";
+                const amount=row[5]||"";
+                const type=row[6]||"";
+                const session=row[7]||"";
+                const tuition=row[8]||"";
+                const transport=row[9]||"";
+                const exam=row[10]||"";
+                const payment=row[11]||"";
+
+                table+=`
+                <tr>
+                <td>${date}</td>
+                <td>${slip}</td>
+                <td>${amount}</td>
+                <td>${type}</td>
+                <td>${session}</td>
+                <td>${tuition}</td>
+                <td>${transport}</td>
+                <td>${exam}</td>
+                <td>${payment}</td>
+                </tr>`;
+
+                cards+=`
+                <div class="fee-card">
+                <div><b>Date:</b> ${date}</div>
+                <div><b>Slip Number:</b> ${slip}</div>
+                <div><b>Amount Paid:</b> ${amount}</div>
+                <div><b>Fee Type:</b> ${type}</div>
+                <div><b>Session:</b> ${session}</div>
+                <div><b>Tuition Fee Months:</b> ${tuition}</div>
+                <div><b>Transport Fee Months:</b> ${transport}</div>
+                <div><b>Exam Fee Months:</b> ${exam}</div>
+                <div><b>Payment Mode:</b> ${payment}</div>
+                </div>`;
+            }
+        }
+
+        document.getElementById("feeTable").innerHTML=table;
+        document.getElementById("feeCards").innerHTML=cards;
+
+        document.getElementById("loginBox").style.display="none";
+        document.getElementById("loader").style.display="none";
+        document.getElementById("portal").style.display="block";
+
+    }catch(err){
+
+        alert("Error loading data");
+        console.error(err);
+        document.getElementById("loader").style.display="none";
+        document.getElementById("loginBtn").disabled=false;
+
+    }
+}
+
+function logout(){
+location.reload();
 }
