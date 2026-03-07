@@ -1,13 +1,13 @@
-const sheetID="1TBykyZx-eRMBDrRGBGGA8p_49iHlVDKN3wt9wijHJWM";
-const apiKey="AIzaSyB5VIy4kIySW7bVrjNYMpL5rkqZ7Oe758E";
+const sheetID = "1TBykyZx-eRMBDrRGBGGA8p_49iHlVDKN3wt9wijHJWM";
+const apiKey = "AIzaSyB5VIy4kIySW7bVrjNYMpL5rkqZ7Oe758E";
 
-const masterSheet="Master Data 25 (New)";
-const feesSheet="Fees Collection";
-const awSheet="AW";
+const masterSheet = encodeURIComponent("Master Data 25 (New)");
+const feesSheet = encodeURIComponent("Fees Collection");
+const awSheet = encodeURIComponent("AW");
 
 async function login(){
 
-const code=document.getElementById("loginCode").value.trim();
+const code = document.getElementById("loginCode").value.trim();
 
 if(code==""){
 alert("Enter Login Code");
@@ -21,10 +21,10 @@ try{
 
 /* ---------------- AW SHEET ---------------- */
 
-const awURL=`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${awSheet}?key=${apiKey}`;
-const awResp=await fetch(awURL);
-const awData=await awResp.json();
-const awRows=awData.values||[];
+let url=`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${awSheet}?key=${apiKey}`;
+let resp=await fetch(url);
+let data=await resp.json();
+let rows=data.values || [];
 
 let admission="";
 let studentName="";
@@ -33,22 +33,21 @@ let mother="";
 let phone="";
 let address="";
 
-for(let i=1;i<awRows.length;i++){
+for(let i=1;i<rows.length;i++){
 
-let row=awRows[i];
+let r=rows[i];
 
-if(row[29] && row[29].trim()==code){
+if(r[29] && r[29].toString().trim()==code){
 
-admission=row[1]||"NA";
-studentName=row[3]||"NA";
-father=row[6]||"NA";
-mother=row[5]||"NA";
-phone=row[22]||"NA";
-address=row[7]||"NA";
+admission=r[1]||"";
+studentName=r[3]||"";
+father=r[6]||"";
+mother=r[5]||"";
+phone=r[22]||"";
+address=r[7]||"";
 
 break;
 }
-
 }
 
 if(admission==""){
@@ -59,13 +58,12 @@ return;
 
 /* ---------------- MASTER SHEET ---------------- */
 
-const masterURL=`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${masterSheet}?key=${apiKey}`;
-const masterResp=await fetch(masterURL);
-const masterData=await masterResp.json();
-const masterRows=masterData.values||[];
+url=`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${masterSheet}?key=${apiKey}`;
+resp=await fetch(url);
+data=await resp.json();
+rows=data.values || [];
 
-let studentClass="NA";
-
+let studentClass="";
 let monthlyTuition=0;
 let tuitionMonths=0;
 let transportFees=0;
@@ -73,27 +71,26 @@ let transportMonths=0;
 let prevRemain=0;
 let discount=0;
 
-for(let i=1;i<masterRows.length;i++){
+for(let i=1;i<rows.length;i++){
 
-let row=masterRows[i];
+let r=rows[i];
 
-if(row[1]==admission){
+if(r[1]==admission){
 
-studentClass=row[13]||"NA";
+studentClass=r[13]||"";
 
-monthlyTuition=parseFloat(row[4])||0;
-prevRemain=parseFloat(row[3])||0;
-discount=parseFloat(row[5])||0;
-tuitionMonths=parseFloat(row[6])||0;
-transportFees=parseFloat(row[7])||0;
-transportMonths=parseFloat(row[8])||0;
+monthlyTuition=parseFloat(r[4])||0;
+prevRemain=parseFloat(r[3])||0;
+discount=parseFloat(r[5])||0;
+tuitionMonths=parseFloat(r[6])||0;
+transportFees=parseFloat(r[7])||0;
+transportMonths=parseFloat(r[8])||0;
 
 break;
 }
-
 }
 
-/* ---------------- STUDENT DETAILS ---------------- */
+/* ---------------- DISPLAY STUDENT ---------------- */
 
 document.getElementById("studentName").innerText=studentName;
 document.getElementById("class").innerText=studentClass;
@@ -105,81 +102,82 @@ document.getElementById("address").innerText=address;
 
 /* ---------------- FEES SHEET ---------------- */
 
-const feesURL=`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${feesSheet}?key=${apiKey}`;
-const feesResp=await fetch(feesURL);
-const feesData=await feesResp.json();
-const feeRows=feesData.values||[];
+url=`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${feesSheet}?key=${apiKey}`;
+resp=await fetch(url);
+data=await resp.json();
+rows=data.values || [];
 
 let table="";
 let cards="";
-
 let totalPaid=0;
 
-for(let i=1;i<feeRows.length;i++){
+for(let i=1;i<rows.length;i++){
 
-let row=feeRows[i];
+let r=rows[i];
 
-if(row[2]==admission){
+if(r[2]==admission){
 
-let r0=row[0]||"NA";
-let r1=row[1]||"NA";
-let r5=parseFloat(row[5])||0;
-let r6=row[6]||"";
-let r7=row[7]||"";
-let r8=row[8]||"";
-let r9=row[9]||"";
-let r10=row[10]||"";
-let r11=row[11]||"";
+let date=r[1]||"";
+let slip=r[0]||"";
+let amount=parseFloat(r[5])||0;
+let feeType=(r[6]||"").toString();
+let session=(r[7]||"").toString();
 
-if(r7=="2025-26" && r6.toLowerCase()=="monthly fees"){
-totalPaid+=r5;
+let tMonths=r[8]||"";
+let trMonths=r[9]||"";
+let exMonths=r[10]||"";
+let mode=r[11]||"";
+
+/* COUNT ONLY MONTHLY FEES */
+
+if(session=="2025-26" && feeType.toLowerCase()=="monthly fees"){
+totalPaid+=amount;
 }
 
-/* ----- TABLE ----- */
+/* TABLE */
 
 table+=`<tr>
-<td>${r1}</td>
-<td>${r0}</td>
-<td>₹${r5}</td>
-<td>${r6}</td>
-<td>${r7}</td>
-<td>${r8}</td>
-<td>${r9}</td>
-<td>${r10}</td>
-<td>${r11}</td>
+<td>${date}</td>
+<td>${slip}</td>
+<td>₹${amount}</td>
+<td>${feeType}</td>
+<td>${session}</td>
+<td>${tMonths}</td>
+<td>${trMonths}</td>
+<td>${exMonths}</td>
+<td>${mode}</td>
 </tr>`;
 
-/* ----- MOBILE CARDS ----- */
+/* MOBILE CARD */
 
 cards+=`<div class="fee-card">
-<div><b>Date:</b> ${r1}</div>
-<div><b>Slip Number:</b> ${r0}</div>
-<div><b>Amount Paid:</b> ₹${r5}</div>
-<div><b>Fee Type:</b> ${r6}</div>
-<div><b>Session:</b> ${r7}</div>
-<div><b>Tuition Fee Months:</b> ${r8}</div>
-<div><b>Transport Fee Months:</b> ${r9}</div>
-<div><b>Exam Fee Months:</b> ${r10}</div>
-<div><b>Payment Mode:</b> ${r11}</div>
+<div><b>Date:</b> ${date}</div>
+<div><b>Slip Number:</b> ${slip}</div>
+<div><b>Amount Paid:</b> ₹${amount}</div>
+<div><b>Fee Type:</b> ${feeType}</div>
+<div><b>Session:</b> ${session}</div>
+<div><b>Tuition Fee Months:</b> ${tMonths}</div>
+<div><b>Transport Fee Months:</b> ${trMonths}</div>
+<div><b>Exam Fee Months:</b> ${exMonths}</div>
+<div><b>Payment Mode:</b> ${mode}</div>
 </div>`;
 
 }
-
 }
 
-/* ---------------- CALCULATIONS ---------------- */
+/* ---------------- CALCULATE BALANCE ---------------- */
 
 let examFee=1000;
 
-let totalFee=
+let totalFee =
 ((monthlyTuition-discount)*tuitionMonths)
 +(transportFees*transportMonths)
 +examFee
 +prevRemain;
 
-let feeBalance=totalFee-totalPaid;
+let feeBalance = totalFee-totalPaid;
 
-/* ---------------- DISPLAY ---------------- */
+/* ---------------- DISPLAY FEES ---------------- */
 
 document.getElementById("feeTable").innerHTML=table;
 document.getElementById("feeCards").innerHTML=cards;
@@ -193,13 +191,13 @@ document.getElementById("discount").innerText="₹"+discount;
 
 document.getElementById("totalPaid").innerText="₹"+totalPaid;
 
-let balance=document.getElementById("feeBalance");
-balance.innerText="₹"+feeBalance;
+let bal=document.getElementById("feeBalance");
+bal.innerText="₹"+feeBalance;
 
 if(feeBalance>0){
-balance.style.color="red";
+bal.style.color="red";
 }else{
-balance.style.color="green";
+bal.style.color="green";
 }
 
 /* ---------------- SHOW PORTAL ---------------- */
@@ -208,11 +206,12 @@ document.getElementById("loginBox").style.display="none";
 document.getElementById("loader").style.display="none";
 document.getElementById("portal").style.display="block";
 
-}catch(error){
+}catch(e){
 
-console.error(error);
-alert("Error loading data");
-location.reload();
+console.error(e);
+alert("Error loading data. Check console.");
+document.getElementById("loader").style.display="none";
+document.getElementById("loginBtn").disabled=false;
 
 }
 
