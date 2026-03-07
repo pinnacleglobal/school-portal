@@ -7,7 +7,7 @@ const awSheet = "AW";
 
 async function login(){
 
-const code = document.getElementById("loginCode").value.trim();
+const code=document.getElementById("loginCode").value.trim();
 
 if(code==""){
 alert("Enter Login Code");
@@ -50,8 +50,7 @@ break;
 
 if(admission==""){
 alert("Invalid Login Code");
-document.getElementById("loader").style.display="none";
-document.getElementById("loginBtn").disabled=false;
+location.reload();
 return;
 }
 
@@ -62,14 +61,32 @@ const masterRows=masterData.values||[];
 
 let studentClass="NA";
 
+let monthlyTuition=0;
+let tuitionMonths=0;
+let transportFees=0;
+let transportMonths=0;
+let prevRemain=0;
+let discount=0;
+
 for(let i=1;i<masterRows.length;i++){
+
 if(masterRows[i][1]==admission){
+
 studentClass=masterRows[i][13]||"NA";
+
+monthlyTuition=parseFloat(masterRows[i][4])||0;
+prevRemain=parseFloat(masterRows[i][3])||0;
+discount=parseFloat(masterRows[i][5])||0;
+tuitionMonths=parseFloat(masterRows[i][6])||0;
+transportFees=parseFloat(masterRows[i][7])||0;
+transportMonths=parseFloat(masterRows[i][8])||0;
+
 break;
 }
+
 }
 
-document.getElementById("studentName").innerText="Welcome, "+studentName;
+document.getElementById("studentName").innerText=studentName;
 document.getElementById("class").innerText=studentClass;
 document.getElementById("adm").innerText=admission;
 document.getElementById("father").innerText=father;
@@ -85,19 +102,25 @@ const feeRows=feesData.values||[];
 let table="";
 let cards="";
 
+let totalPaid=0;
+
 for(let i=1;i<feeRows.length;i++){
 
 if(feeRows[i][2]==admission){
 
 const r0=feeRows[i][0]||"NA";
 const r1=feeRows[i][1]||"NA";
-const r5=feeRows[i][5]||"NA";
+const r5=feeRows[i][5]||"0";
 const r6=feeRows[i][6]||"NA";
 const r7=feeRows[i][7]||"NA";
 const r8=feeRows[i][8]||"NA";
 const r9=feeRows[i][9]||"NA";
 const r10=feeRows[i][10]||"NA";
 const r11=feeRows[i][11]||"NA";
+
+if(r7=="2025-26"){
+totalPaid+=parseFloat(r5)||0;
+}
 
 table+=`<tr>
 <td>${r1}</td>
@@ -127,8 +150,28 @@ cards+=`<div class="fee-card">
 
 }
 
+let examFee=1000;
+
+let totalFee=
+((monthlyTuition-discount)*tuitionMonths)
++(transportFees*transportMonths)
++examFee
++prevRemain;
+
+let feeBalance=totalFee-totalPaid;
+
 document.getElementById("feeTable").innerHTML=table;
 document.getElementById("feeCards").innerHTML=cards;
+
+document.getElementById("monthlyTuition").innerText=monthlyTuition;
+document.getElementById("tuitionMonths").innerText=tuitionMonths;
+document.getElementById("transportFees").innerText=transportFees;
+document.getElementById("transportMonths").innerText=transportMonths;
+document.getElementById("prevRemain").innerText=prevRemain;
+document.getElementById("discount").innerText=discount;
+
+document.getElementById("totalPaid").innerText=totalPaid;
+document.getElementById("feeBalance").innerText=feeBalance;
 
 document.getElementById("loginBox").style.display="none";
 document.getElementById("loader").style.display="none";
@@ -137,8 +180,7 @@ document.getElementById("portal").style.display="block";
 }catch(error){
 
 alert("Error loading data");
-document.getElementById("loader").style.display="none";
-document.getElementById("loginBtn").disabled=false;
+location.reload();
 
 }
 
