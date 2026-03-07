@@ -1,207 +1,149 @@
-const sheetURL = "https://script.google.com/macros/s/AKfycbz2cXoii3UFrtivVFi6TNjnQqMQ2vIgea7RaZ5JNxHdP8IhS6DXFbyoqvBDdljdarii/exec";
+const sheetID = "1TBykyZx-eRMBDrRGBGGA8p_49iHlVDKN3wt9wijHJWM";
+const apiKey = "AIzaSyB5VIy4kIySW7bVrjNYMpL5rkqZ7Oe758E";
 
-let deferredPrompt;
-const installBtn = document.getElementById("installBtn");
+const masterSheet = "Master Data 25 (New)";
+const feesSheet = "Fees Collection";
+const awSheet = "AW";
 
-/* INSTALL APP */
+async function login(){
 
-if(localStorage.getItem("pwaInstalled")){
-installBtn.style.display="none";
+const code = document.getElementById("loginCode").value.trim();
+
+if(code==""){
+alert("Enter Login Code");
+return;
 }
 
-window.addEventListener("beforeinstallprompt",(e)=>{
+document.getElementById("loginBtn").disabled=true;
+document.getElementById("loader").style.display="block";
 
-e.preventDefault();
-deferredPrompt=e;
+try{
 
-if(!localStorage.getItem("pwaInstalled")){
-installBtn.style.display="block";
-}
+const awURL=`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${awSheet}?key=${apiKey}`;
+const awResp=await fetch(awURL);
+const awData=await awResp.json();
+const awRows=awData.values||[];
 
-});
+let admission="";
+let studentName="";
+let father="";
+let mother="";
+let phone="";
+let address="";
 
-installBtn.addEventListener("click",async()=>{
+for(let i=1;i<awRows.length;i++){
 
-if(!deferredPrompt) return;
+if(awRows[i][29] && awRows[i][29].trim()==code){
 
-deferredPrompt.prompt();
+admission=awRows[i][1]||"NA";
+studentName=awRows[i][3]||"NA";
+father=awRows[i][6]||"NA";
+mother=awRows[i][5]||"NA";
+phone=awRows[i][22]||"NA";
+address=awRows[i][7]||"NA";
 
-const result=await deferredPrompt.userChoice;
-
-if(result.outcome==="accepted"){
-
-localStorage.setItem("pwaInstalled","true");
-
-installBtn.style.display="none";
-
-}
-
-});
-
-window.addEventListener("appinstalled",()=>{
-
-localStorage.setItem("pwaInstalled","true");
-
-installBtn.style.display="none";
-
-});
-
-
-/* LOGIN */
-
-function login(){
-
-showLoading();
-
-const adm=document.getElementById("adm").value;
-
-const dob=document.getElementById("dob").value;
-
-fetch(`${sheetURL}?adm=${adm}&dob=${dob}`)
-
-.then(res=>res.json())
-
-.then(data=>{
-
-hideLoading();
-
-if(data.status==="success"){
-
-document.getElementById("loginPage").style.display="none";
-
-document.getElementById("dashboard").style.display="block";
-
-loadStudent(data.student);
-
-loadFees(data.fees);
-
-}else{
-
-alert("Invalid Login");
+break;
 
 }
 
-});
+}
+
+if(admission==""){
+alert("Invalid Login Code");
+document.getElementById("loader").style.display="none";
+document.getElementById("loginBtn").disabled=false;
+return;
+}
+
+const masterURL=`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${masterSheet}?key=${apiKey}`;
+const masterResp=await fetch(masterURL);
+const masterData=await masterResp.json();
+const masterRows=masterData.values||[];
+
+let studentClass="NA";
+
+for(let i=1;i<masterRows.length;i++){
+if(masterRows[i][1]==admission){
+studentClass=masterRows[i][13]||"NA";
+break;
+}
+}
+
+document.getElementById("studentName").innerText="Welcome, "+studentName;
+document.getElementById("class").innerText=studentClass;
+document.getElementById("adm").innerText=admission;
+document.getElementById("father").innerText=father;
+document.getElementById("mother").innerText=mother;
+document.getElementById("phone").innerText=phone;
+document.getElementById("address").innerText=address;
+
+const feesURL=`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${feesSheet}?key=${apiKey}`;
+const feesResp=await fetch(feesURL);
+const feesData=await feesResp.json();
+const feeRows=feesData.values||[];
+
+let table="";
+let cards="";
+
+for(let i=1;i<feeRows.length;i++){
+
+if(feeRows[i][2]==admission){
+
+const r0=feeRows[i][0]||"NA";
+const r1=feeRows[i][1]||"NA";
+const r5=feeRows[i][5]||"NA";
+const r6=feeRows[i][6]||"NA";
+const r7=feeRows[i][7]||"NA";
+const r8=feeRows[i][8]||"NA";
+const r9=feeRows[i][9]||"NA";
+const r10=feeRows[i][10]||"NA";
+const r11=feeRows[i][11]||"NA";
+
+table+=`<tr>
+<td>${r1}</td>
+<td>${r0}</td>
+<td>${r5}</td>
+<td>${r6}</td>
+<td>${r7}</td>
+<td>${r8}</td>
+<td>${r9}</td>
+<td>${r10}</td>
+<td>${r11}</td>
+</tr>`;
+
+cards+=`<div class="fee-card">
+<div><b>Date:</b> ${r1}</div>
+<div><b>Slip Number:</b> ${r0}</div>
+<div><b>Amount Paid:</b> ${r5}</div>
+<div><b>Fee Type:</b> ${r6}</div>
+<div><b>Session:</b> ${r7}</div>
+<div><b>Tuition Fee Months:</b> ${r8}</div>
+<div><b>Transport Fee Months:</b> ${r9}</div>
+<div><b>Exam Fee Months:</b> ${r10}</div>
+<div><b>Payment Mode:</b> ${r11}</div>
+</div>`;
 
 }
 
-/* STUDENT DETAILS */
+}
 
-function loadStudent(student){
+document.getElementById("feeTable").innerHTML=table;
+document.getElementById("feeCards").innerHTML=cards;
 
-const container=document.getElementById("studentDetails");
+document.getElementById("loginBox").style.display="none";
+document.getElementById("loader").style.display="none";
+document.getElementById("portal").style.display="block";
 
-container.innerHTML="";
+}catch(error){
 
-container.innerHTML=`
-
-<p><strong>Name:</strong> ${student.name}</p>
-
-<p><strong>Class:</strong> ${student.class}</p>
-
-<p><strong>Admission Number:</strong> ${student.admission}</p>
-
-<p><strong>Father's Name:</strong> ${student.father}</p>
-
-<p><strong>Mother's Name:</strong> ${student.mother}</p>
-
-<p><strong>Phone Number:</strong> ${student.phone}</p>
-
-<p><strong>Address:</strong> ${student.address}</p>
-
-`;
+alert("Error loading data");
+document.getElementById("loader").style.display="none";
+document.getElementById("loginBtn").disabled=false;
 
 }
 
-/* FEES */
-
-function loadFees(fees){
-
-const table=document.getElementById("tableBody");
-
-const cards=document.getElementById("mobileCards");
-
-table.innerHTML="";
-cards.innerHTML="";
-
-fees.forEach(f=>{
-
-/* DESKTOP TABLE */
-
-table.innerHTML+=`
-
-<tr>
-
-<td>${f.date}</td>
-
-<td>${f.slip}</td>
-
-<td>${f.tuition}</td>
-
-<td>${f.transport}</td>
-
-<td>${f.exam}</td>
-
-<td>${f.amount}</td>
-
-<td>${f.payment}</td>
-
-</tr>
-
-`;
-
-/* MOBILE CARDS */
-
-cards.innerHTML+=`
-
-<div class="fee-card">
-
-<p><b>Date:</b> ${f.date}</p>
-
-<p><b>Slip Number:</b> ${f.slip}</p>
-
-<p><b>Tuition Fee Months:</b> ${f.tuition}</p>
-
-<p><b>Transport Fee Months:</b> ${f.transport}</p>
-
-<p><b>Exam Fee Months:</b> ${f.exam}</p>
-
-<p><b>Amount Paid:</b> ${f.amount}</p>
-
-<p><b>Payment Mode:</b> ${f.payment}</p>
-
-</div>
-
-`;
-
-});
-
 }
-
-/* LOADING */
-
-function showLoading(){
-
-document.getElementById("loadingScreen").style.display="flex";
-
-}
-
-function hideLoading(){
-
-document.getElementById("loadingScreen").style.display="none";
-
-}
-
-/* LOGOUT */
 
 function logout(){
-
-showLoading();
-
-setTimeout(()=>{
-
 location.reload();
-
-},800);
-
 }
