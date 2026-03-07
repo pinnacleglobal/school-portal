@@ -19,6 +19,8 @@ document.getElementById("loader").style.display="block";
 
 try{
 
+/* ---------------- AW SHEET ---------------- */
+
 const awURL=`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${awSheet}?key=${apiKey}`;
 const awResp=await fetch(awURL);
 const awData=await awResp.json();
@@ -33,14 +35,16 @@ let address="";
 
 for(let i=1;i<awRows.length;i++){
 
-if(awRows[i][29] && awRows[i][29].trim()==code){
+let row=awRows[i];
 
-admission=awRows[i][1]||"NA";
-studentName=awRows[i][3]||"NA";
-father=awRows[i][6]||"NA";
-mother=awRows[i][5]||"NA";
-phone=awRows[i][22]||"NA";
-address=awRows[i][7]||"NA";
+if(row[29] && row[29].trim()==code){
+
+admission=row[1]||"NA";
+studentName=row[3]||"NA";
+father=row[6]||"NA";
+mother=row[5]||"NA";
+phone=row[22]||"NA";
+address=row[7]||"NA";
 
 break;
 }
@@ -52,6 +56,8 @@ alert("Invalid Login Code");
 location.reload();
 return;
 }
+
+/* ---------------- MASTER SHEET ---------------- */
 
 const masterURL=`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${masterSheet}?key=${apiKey}`;
 const masterResp=await fetch(masterURL);
@@ -69,21 +75,25 @@ let discount=0;
 
 for(let i=1;i<masterRows.length;i++){
 
-if(masterRows[i][1]==admission){
+let row=masterRows[i];
 
-studentClass=masterRows[i][13]||"NA";
+if(row[1]==admission){
 
-monthlyTuition=parseFloat(masterRows[i][4])||0;
-prevRemain=parseFloat(masterRows[i][3])||0;
-discount=parseFloat(masterRows[i][5])||0;
-tuitionMonths=parseFloat(masterRows[i][6])||0;
-transportFees=parseFloat(masterRows[i][7])||0;
-transportMonths=parseFloat(masterRows[i][8])||0;
+studentClass=row[13]||"NA";
+
+monthlyTuition=parseFloat(row[4])||0;
+prevRemain=parseFloat(row[3])||0;
+discount=parseFloat(row[5])||0;
+tuitionMonths=parseFloat(row[6])||0;
+transportFees=parseFloat(row[7])||0;
+transportMonths=parseFloat(row[8])||0;
 
 break;
 }
 
 }
+
+/* ---------------- STUDENT DETAILS ---------------- */
 
 document.getElementById("studentName").innerText=studentName;
 document.getElementById("class").innerText=studentClass;
@@ -93,6 +103,8 @@ document.getElementById("mother").innerText=mother;
 document.getElementById("phone").innerText=phone;
 document.getElementById("address").innerText=address;
 
+/* ---------------- FEES SHEET ---------------- */
+
 const feesURL=`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${feesSheet}?key=${apiKey}`;
 const feesResp=await fetch(feesURL);
 const feesData=await feesResp.json();
@@ -100,25 +112,30 @@ const feeRows=feesData.values||[];
 
 let table="";
 let cards="";
+
 let totalPaid=0;
 
 for(let i=1;i<feeRows.length;i++){
 
-if(feeRows[i][2]==admission){
+let row=feeRows[i];
 
-const r0=feeRows[i][0]||"NA";
-const r1=feeRows[i][1]||"NA";
-const r5=parseFloat(feeRows[i][5])||0;
-const r6=feeRows[i][6]||"NA";
-const r7=feeRows[i][7]||"NA";
-const r8=feeRows[i][8]||"NA";
-const r9=feeRows[i][9]||"NA";
-const r10=feeRows[i][10]||"NA";
-const r11=feeRows[i][11]||"NA";
+if(row[2]==admission){
 
-if(r7=="2025-26" && r6=="Monthly Fees"){
+let r0=row[0]||"NA";
+let r1=row[1]||"NA";
+let r5=parseFloat(row[5])||0;
+let r6=row[6]||"";
+let r7=row[7]||"";
+let r8=row[8]||"";
+let r9=row[9]||"";
+let r10=row[10]||"";
+let r11=row[11]||"";
+
+if(r7=="2025-26" && r6.toLowerCase()=="monthly fees"){
 totalPaid+=r5;
 }
+
+/* ----- TABLE ----- */
 
 table+=`<tr>
 <td>${r1}</td>
@@ -131,6 +148,8 @@ table+=`<tr>
 <td>${r10}</td>
 <td>${r11}</td>
 </tr>`;
+
+/* ----- MOBILE CARDS ----- */
 
 cards+=`<div class="fee-card">
 <div><b>Date:</b> ${r1}</div>
@@ -148,6 +167,8 @@ cards+=`<div class="fee-card">
 
 }
 
+/* ---------------- CALCULATIONS ---------------- */
+
 let examFee=1000;
 
 let totalFee=
@@ -157,6 +178,8 @@ let totalFee=
 +prevRemain;
 
 let feeBalance=totalFee-totalPaid;
+
+/* ---------------- DISPLAY ---------------- */
 
 document.getElementById("feeTable").innerHTML=table;
 document.getElementById("feeCards").innerHTML=cards;
@@ -179,12 +202,15 @@ balance.style.color="red";
 balance.style.color="green";
 }
 
+/* ---------------- SHOW PORTAL ---------------- */
+
 document.getElementById("loginBox").style.display="none";
 document.getElementById("loader").style.display="none";
 document.getElementById("portal").style.display="block";
 
 }catch(error){
 
+console.error(error);
 alert("Error loading data");
 location.reload();
 
