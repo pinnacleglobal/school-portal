@@ -1,5 +1,5 @@
 const sheetID = "1TBykyZx-eRMBDrRGBGGA8p_49iHlVDKN3wt9wijHJWM";
-const apiKey = "AIzaSyB5VIy4kIySW7bVrjNYMpL5rkqZ7Oe758E"; // Replace with your API key
+const apiKey = "AIzaSyB5VIy4kIySW7bVrjNYMpL5rkqZ7Oe758E"; // Replace with your API Key
 const masterSheet = "Master Data 25 (New)";
 const feesSheet = "Fees Collection";
 const awSheet = "AW";
@@ -49,21 +49,47 @@ window.addEventListener('DOMContentLoaded', () => {
       const studentClass = masterRow?.[13]||"NA";
 
       setText("studentName","Welcome, "+studentName);
-      setText("class","Class : "+studentClass);
-      setText("adm","Admission No : "+admission);
-      setText("father","Father's Name : "+father);
-      setText("mother","Mother's Name : "+mother);
-      setText("phone","Phone Number : "+phone);
-      setText("address","Address : "+address);
+      setText("class",studentClass);
+      setText("adm",admission);
+      setText("father",father);
+      setText("mother",mother);
+      setText("phone",phone);
+      setText("address",address);
 
       const feeData = await fetchSheet(feesSheet);
       let tableHTML="", cardsHTML="";
+      let alternate=false;
 
       feeData.slice(1).forEach(row=>{
         if(row[2]===admission){
-          const [r0,r1,r5,r6,r7,r8,r9,r10] = [row[0]||"",row[1]||"",row[5]||"",row[6]||"",row[7]||"",row[8]||"",row[9]||"",row[10]||""];
-          tableHTML += `<tr><td>${r1}</td><td>${r0}</td><td>${r5}</td><td>${r6}</td><td>${r7}</td><td>${r8}</td><td>${r9}</td><td>${r10}</td></tr>`;
-          cardsHTML += `<div class="fee-card"><div><b>Date:</b> ${r1}</div><div><b>Slip No:</b> ${r0}</div><div><b>Amount:</b> ${r5}</div><div><b>Fee Type:</b> ${r6}</div><div><b>Session:</b> ${r7}</div><div><b>Tuition:</b> ${r8}</div><div><b>Transport:</b> ${r9}</div><div><b>Exam:</b> ${r10}</div></div>`;
+          const [r0,r1,r5,r6,r7,r8,r9,r10,r11] = [row[0]||"",row[1]||"",row[5]||"",row[6]||"",row[7]||"",row[8]||"",row[9]||"",row[10]||"",row[11]||""];
+
+          // Desktop table
+          tableHTML += `<tr>
+            <td>${r1}</td>
+            <td>${r0}</td>
+            <td>${r5}</td>
+            <td>${r6}</td>
+            <td>${r7}</td>
+            <td>${r8}</td>
+            <td>${r9}</td>
+            <td>${r10}</td>
+            <td>${r11}</td>
+          </tr>`;
+
+          // Mobile fee card
+          cardsHTML += `<div class="fee-card ${alternate?'alt':''}">
+            <div><span class="label">Date:</span> ${r1}</div>
+            <div><span class="label">Slip Number:</span> ${r0}</div>
+            <div><span class="label">Amount Paid:</span> ${r5}</div>
+            <div><span class="label">Fee Type:</span> ${r6}</div>
+            <div><span class="label">Session:</span> ${r7}</div>
+            <div><span class="label">Tuition Fee Months:</span> ${r8}</div>
+            <div><span class="label">Transport Fee Months:</span> ${r9}</div>
+            <div><span class="label">Exam Fee Months:</span> ${r10}</div>
+            <div><span class="label">Payment Mode:</span> ${r11}</div>
+          </div>`;
+          alternate = !alternate;
         }
       });
 
