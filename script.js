@@ -117,7 +117,7 @@ const r9=feeRows[i][9]||"NA";
 const r10=feeRows[i][10]||"NA";
 const r11=feeRows[i][11]||"NA";
 
-if(r7=="2025-26" && r6.toLowerCase()=="monthly fee"){
+if(r7=="2025-26" && r6.toLowerCase()=="monthly fees"){
 totalPaid+=parseFloat(r5)||0;
 }
 
