@@ -14,7 +14,7 @@
 <style>
 body { font-family: Arial; margin: 0; background: #f2f5ff; }
 
-/* Top Install Header (Sticky) */
+/* Sticky Top Install Header */
 .install-header {
     background: white;
     padding: 10px;
@@ -49,22 +49,24 @@ button:disabled { background: gray; }
 /* Profile */
 .profile { text-align: center; background: white; margin: 15px; padding: 25px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
 .student-name { font-size: 22px; font-weight: bold; margin-bottom: 10px; }
-.info { font-size: 15px; margin: 6px 0; }
+.info span.label { font-weight: bold; }
 
 /* Section Title */
-.section-title { background: #0b3d91; color: white; padding: 12px; margin: 15px; border-radius: 6px; font-size: 18px; font-weight: bold; text-align: center; }
+.section-title { background: #d4af37; color: black; padding: 12px; margin: 15px; border-radius: 6px; font-size: 18px; font-weight: bold; text-align: center; }
 
 /* Table */
 .table-container { margin: 15px; }
 table { width: 100%; border-collapse: collapse; background: white; }
 th, td { border: 1px solid #ddd; padding: 10px; text-align: center; font-size: 14px; }
-th { background: #0b3d91; color: white; font-weight: bold; }
-tr:nth-child(even) { background: #e8f1ff; }
+th { background: #d4af37; color: black; font-weight: bold; }
+tr:nth-child(even){ background: #e8f1ff; }
 
 /* Mobile Cards */
 .fee-cards { display: none; padding: 15px; }
 .fee-card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+.fee-card.alt { background: #e8f1ff; }
 .fee-card div { margin: 5px 0; font-size: 14px; }
+.fee-card div span.label { font-weight: bold; }
 @media(max-width:600px){
     .table-container { display: none; }
     .fee-cards { display: block; }
@@ -80,7 +82,7 @@ tr:nth-child(even) { background: #e8f1ff; }
 </head>
 <body>
 
-<!-- Sticky Top Install App Header -->
+<!-- Sticky Install App Header -->
 <div class="install-header">
     <button id="installBtn">Install App</button>
 </div>
@@ -112,22 +114,30 @@ tr:nth-child(even) { background: #e8f1ff; }
 <div id="portal" style="display:none">
     <div class="profile">
         <div class="student-name" id="studentName"></div>
-        <div class="info" id="class"></div>
-        <div class="info" id="adm"></div>
-        <div class="info" id="father"></div>
-        <div class="info" id="mother"></div>
-        <div class="info" id="phone"></div>
-        <div class="info" id="address"></div>
+        <div class="info"><span class="label">Class:</span> <span id="class"></span></div>
+        <div class="info"><span class="label">Admission Number:</span> <span id="adm"></span></div>
+        <div class="info"><span class="label">Father's Name:</span> <span id="father"></span></div>
+        <div class="info"><span class="label">Mother's Name:</span> <span id="mother"></span></div>
+        <div class="info"><span class="label">Phone Number:</span> <span id="phone"></span></div>
+        <div class="info"><span class="label">Address:</span> <span id="address"></span></div>
     </div>
 
-    <div class="section-title">Fee Details</div>
+    <div class="section-title">Paid Fee Details</div>
 
     <!-- Desktop Table -->
     <div class="table-container">
         <table>
             <thead>
                 <tr>
-                    <th>Date</th><th>Slip No</th><th>Amount</th><th>Fee Type</th><th>Session</th><th>Tuition</th><th>Transport</th><th>Exam</th>
+                    <th>Date</th>
+                    <th>Slip Number</th>
+                    <th>Amount Paid</th>
+                    <th>Fee Type</th>
+                    <th>Session</th>
+                    <th>Tuition Fee Months</th>
+                    <th>Transport Fee Months</th>
+                    <th>Exam Fee Months</th>
+                    <th>Payment Mode</th>
                 </tr>
             </thead>
             <tbody id="feeTable"></tbody>
