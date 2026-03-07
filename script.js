@@ -100,7 +100,6 @@ const feeRows=feesData.values||[];
 
 let table="";
 let cards="";
-
 let totalPaid=0;
 
 for(let i=1;i<feeRows.length;i++){
@@ -109,7 +108,7 @@ if(feeRows[i][2]==admission){
 
 const r0=feeRows[i][0]||"NA";
 const r1=feeRows[i][1]||"NA";
-const r5=feeRows[i][5]||"0";
+const r5=parseFloat(feeRows[i][5])||0;
 const r6=feeRows[i][6]||"NA";
 const r7=feeRows[i][7]||"NA";
 const r8=feeRows[i][8]||"NA";
@@ -117,8 +116,8 @@ const r9=feeRows[i][9]||"NA";
 const r10=feeRows[i][10]||"NA";
 const r11=feeRows[i][11]||"NA";
 
-if(r7=="2025-26" && r6.toLowerCase()=="monthly fees"){
-totalPaid+=parseFloat(r5)||0;
+if(r7=="2025-26" && r6=="Monthly Fees"){
+totalPaid+=r5;
 }
 
 table+=`<tr>
@@ -171,13 +170,13 @@ document.getElementById("discount").innerText="₹"+discount;
 
 document.getElementById("totalPaid").innerText="₹"+totalPaid;
 
-let balanceElement=document.getElementById("feeBalance");
-balanceElement.innerText="₹"+feeBalance;
+let balance=document.getElementById("feeBalance");
+balance.innerText="₹"+feeBalance;
 
 if(feeBalance>0){
-balanceElement.style.color="red";
+balance.style.color="red";
 }else{
-balanceElement.style.color="green";
+balance.style.color="green";
 }
 
 document.getElementById("loginBox").style.display="none";
