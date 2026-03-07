@@ -1,9 +1,9 @@
-const sheetID = "1TBykyZx-eRMBDrRGBGGA8p_49iHlVDKN3wt9wijHJWM";
-const apiKey = "AIzaSyB5VIy4kIySW7bVrjNYMpL5rkqZ7Oe758E";
+const sheetID="1TBykyZx-eRMBDrRGBGGA8p_49iHlVDKN3wt9wijHJWM";
+const apiKey="AIzaSyB5VIy4kIySW7bVrjNYMpL5rkqZ7Oe758E";
 
-const masterSheet = "Master Data 25 (New)";
-const feesSheet = "Fees Collection";
-const awSheet = "AW";
+const masterSheet="Master Data 25 (New)";
+const feesSheet="Fees Collection";
+const awSheet="AW";
 
 async function login(){
 
@@ -43,7 +43,6 @@ phone=awRows[i][22]||"NA";
 address=awRows[i][7]||"NA";
 
 break;
-
 }
 
 }
@@ -118,14 +117,14 @@ const r9=feeRows[i][9]||"NA";
 const r10=feeRows[i][10]||"NA";
 const r11=feeRows[i][11]||"NA";
 
-if(r7=="2025-26" && r6=="Monthly Fees"){
+if(r7=="2025-26" && r6.toLowerCase()=="monthly fee"){
 totalPaid+=parseFloat(r5)||0;
 }
 
 table+=`<tr>
 <td>${r1}</td>
 <td>${r0}</td>
-<td>${r5}</td>
+<td>₹${r5}</td>
 <td>${r6}</td>
 <td>${r7}</td>
 <td>${r8}</td>
@@ -137,7 +136,7 @@ table+=`<tr>
 cards+=`<div class="fee-card">
 <div><b>Date:</b> ${r1}</div>
 <div><b>Slip Number:</b> ${r0}</div>
-<div><b>Amount Paid:</b> ${r5}</div>
+<div><b>Amount Paid:</b> ₹${r5}</div>
 <div><b>Fee Type:</b> ${r6}</div>
 <div><b>Session:</b> ${r7}</div>
 <div><b>Tuition Fee Months:</b> ${r8}</div>
@@ -163,15 +162,23 @@ let feeBalance=totalFee-totalPaid;
 document.getElementById("feeTable").innerHTML=table;
 document.getElementById("feeCards").innerHTML=cards;
 
-document.getElementById("monthlyTuition").innerText=monthlyTuition;
+document.getElementById("monthlyTuition").innerText="₹"+monthlyTuition;
 document.getElementById("tuitionMonths").innerText=tuitionMonths;
-document.getElementById("transportFees").innerText=transportFees;
+document.getElementById("transportFees").innerText="₹"+transportFees;
 document.getElementById("transportMonths").innerText=transportMonths;
-document.getElementById("prevRemain").innerText=prevRemain;
-document.getElementById("discount").innerText=discount;
+document.getElementById("prevRemain").innerText="₹"+prevRemain;
+document.getElementById("discount").innerText="₹"+discount;
 
-document.getElementById("totalPaid").innerText=totalPaid;
-document.getElementById("feeBalance").innerText=feeBalance;
+document.getElementById("totalPaid").innerText="₹"+totalPaid;
+
+let balanceElement=document.getElementById("feeBalance");
+balanceElement.innerText="₹"+feeBalance;
+
+if(feeBalance>0){
+balanceElement.style.color="red";
+}else{
+balanceElement.style.color="green";
+}
 
 document.getElementById("loginBox").style.display="none";
 document.getElementById("loader").style.display="none";
