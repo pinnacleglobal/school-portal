@@ -6,50 +6,56 @@ const feesSheet = "Fees Collection";
 const awSheet = "AW";
 
 let deferredPrompt;
+const installBtn = document.getElementById("installBtn");
 
-/* Detect if app is already installed */
-function isRunningStandalone() {
-  return (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true
-  );
+// Function to hide install button if app already installed
+function checkIfInstalled() {
+    const isStandalone =
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone === true;
+
+    if (isStandalone) {
+        installBtn.style.display = "none";
+    }
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+// Run check when page loads
+window.addEventListener("load", () => {
+    checkIfInstalled();
+});
 
-  const installBtn = document.getElementById("installBtn");
-
-  /* Hide button if already installed */
-  if (isRunningStandalone()) {
-    if (installBtn) installBtn.style.display = "none";
-  }
-
-  /* Show install button when browser allows */
-  window.addEventListener("beforeinstallprompt", (e) => {
+// Listen for install prompt availability
+window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     deferredPrompt = e;
 
-    if (!isRunningStandalone()) {
-      installBtn.style.display = "inline-block";
+    // Show button only if not installed
+    if (!window.matchMedia('(display-mode: standalone)').matches) {
+        installBtn.style.display = "block";
     }
-  });
+});
 
-  /* Install button click */
-  installBtn.addEventListener("click", async () => {
+// Install button click
+installBtn.addEventListener("click", async () => {
     if (!deferredPrompt) return;
 
     deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
 
-    if (choice.outcome === "accepted") {
-      installBtn.style.display = "none";
+    const { outcome } = await deferredPrompt.userChoice;
+
+    if (outcome === "accepted") {
+        console.log("App installed");
     }
 
     deferredPrompt = null;
-  });
-
+    installBtn.style.display = "none";
 });
 
+// Detect successful install
+window.addEventListener("appinstalled", () => {
+    console.log("PWA installed");
+    installBtn.style.display = "none";
+});
 
 async function login(){
 
