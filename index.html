@@ -76,24 +76,6 @@ margin:auto;
 100%{transform:rotate(360deg);}
 }
 
-.profile{
-text-align:left;
-background:white;
-margin:15px;
-padding:25px;
-border-radius:10px;
-box-shadow:0 2px 6px rgba(0,0,0,0.1);
-}
-
-.info{
-font-size:15px;
-margin:6px 0;
-}
-
-.label{
-font-weight:bold;
-}
-
 .section-title{
 background:#d4af37;
 color:black;
@@ -103,6 +85,24 @@ border-radius:6px;
 font-size:18px;
 font-weight:bold;
 text-align:center;
+}
+
+.profile{
+text-align:left;
+background:white;
+margin:15px;
+padding:20px;
+border-radius:10px;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+
+.info{
+font-size:15px;
+margin:8px 0;
+}
+
+.label{
+font-weight:bold;
 }
 
 .table-container{
@@ -161,6 +161,12 @@ display:none;
 display:block;
 }
 
+.profile .info{
+display:flex;
+justify-content:space-between;
+font-size:16px;
+}
+
 }
 
 .logout{
@@ -175,10 +181,8 @@ margin:20px;
 <body>
 
 <div class="header">
-
 <img src="images/logo.png" class="logo">
 <h2>Student Fee Portal</h2>
-
 </div>
 
 <div class="login-box" id="loginBox">
@@ -187,6 +191,7 @@ margin:20px;
 
 <input type="text" id="loginCode" placeholder="Enter Login Code">
 <br><br>
+
 <button id="loginBtn" onclick="login()">Login</button>
 
 </div>
@@ -254,17 +259,11 @@ Fee Structure
 <div class="profile">
 
 <div class="info"><span class="label">Monthly Tuition Fees :</span> <span id="monthlyTuition"></span></div>
-
 <div class="info"><span class="label">Tuition Fees for Months :</span> <span id="tuitionMonths"></span></div>
-
 <div class="info"><span class="label">Transport Fees :</span> <span id="transportFees"></span></div>
-
 <div class="info"><span class="label">Transport Fees Months :</span> <span id="transportMonths"></span></div>
-
-<div class="info"><span class="label">Exam Fee (500+500) :</span> 1000</div>
-
+<div class="info"><span class="label">Exam Fee (500 + 500) :</span> ₹1000</div>
 <div class="info"><span class="label">Previous Year Fee Remain :</span> <span id="prevRemain"></span></div>
-
 <div class="info"><span class="label">Discount :</span> <span id="discount"></span></div>
 
 </div>
@@ -275,9 +274,15 @@ Fee Summary
 
 <div class="profile">
 
-<div class="info"><span class="label">Total Fees Paid in Current Session :</span> <span id="totalPaid"></span></div>
+<div class="info">
+<span class="label">Total Fees Paid in Current Session :</span>
+<span id="totalPaid"></span>
+</div>
 
-<div class="info"><span class="label">Fee Balance :</span> <span id="feeBalance"></span></div>
+<div class="info">
+<span class="label">Fee Balance :</span>
+<span id="feeBalance"></span>
+</div>
 
 </div>
 
