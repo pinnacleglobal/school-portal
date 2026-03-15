@@ -30,7 +30,7 @@ body{
   padding:30px;
 }
 
-input{
+input, select{
   padding:12px;
   width:230px;
   font-size:16px;
@@ -153,9 +153,30 @@ tr:nth-child(even){
   }
 }
 
+/* Mobile-only buttons */
+.mobile-only{
+  display:none;
+}
+@media(max-width:600px){
+  .mobile-only{
+    display:inline-block;
+  }
+}
+
 .logout{
   text-align:center;
   margin:20px;
+}
+
+.pay-btn{
+  background:#28a745;
+  color:white;
+  border:none;
+  padding:12px 25px;
+  border-radius:4px;
+  cursor:pointer;
+  font-size:16px;
+  margin-top:10px;
 }
 </style>
 </head>
@@ -171,7 +192,7 @@ tr:nth-child(even){
   <h3>Student Login</h3>
   <input type="text" id="loginCode" placeholder="Enter Login Code">
   <br><br>
-  <button id="loginBtn" onclick="login()">Login</button>
+  <button id="loginBtn">Login</button>
 </div>
 
 <div class="loader" id="loader">
@@ -238,6 +259,33 @@ tr:nth-child(even){
   <div class="profile">
     <div class="info"><span class="label">Total Fees Paid in Current Session :</span> <span id="totalPaid"></span></div>
     <div class="info"><span class="label">Fee Balance :</span> <span id="feeBalance"></span></div>
+    <div class="info">
+      <button id="payBalanceBtn" class="pay-btn mobile-only">Pay Now</button>
+    </div>
+  </div>
+
+  <!-- FEE CALCULATOR -->
+  <div class="section-title">Calculate Fees</div>
+  <div class="profile">
+    <div class="info">
+      <label class="label">Choose Monthly Tuition Fee Months :</label>
+      <select id="calcTuitionMonths"></select>
+    </div>
+    <div class="info">
+      <label class="label">Choose Transport Fee Months :</label>
+      <select id="calcTransportMonths"></select>
+    </div>
+    <div class="info">
+      <label class="label">Choose Exam Fee Months :</label>
+      <select id="calcExamMonths"></select>
+    </div>
+    <div class="info">
+      <label class="label">Fees to be Paid :</label>
+      <span id="calcTotal">₹0</span>
+    </div>
+    <div class="info">
+      <button id="payNowBtn" class="pay-btn mobile-only">Pay Now</button>
+    </div>
   </div>
 
   <div class="logout">
