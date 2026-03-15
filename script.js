@@ -124,6 +124,12 @@ async function login() {
     document.getElementById("loader").style.display="none";
     document.getElementById("portal").style.display="block";
 
+    // Populate calculator dropdowns
+    populateFeeSelectors();
+
+    // Setup Fee Balance Pay Now button
+    setupFeeBalancePayment();
+
   } catch(e){
     console.error(e);
     alert("Error loading data. Check console.");
@@ -133,3 +139,85 @@ async function login() {
 }
 
 function logout(){ location.reload(); }
+
+// ------------------ FEE CALCULATOR ------------------
+function populateFeeSelectors() {
+  const tuitionSelect = document.getElementById("calcTuitionMonths");
+  const transportSelect = document.getElementById("calcTransportMonths");
+  const examSelect = document.getElementById("calcExamMonths");
+
+  tuitionSelect.innerHTML = "";
+  transportSelect.innerHTML = "";
+  examSelect.innerHTML = "";
+
+  for (let i = 0; i <= 12; i++) tuitionSelect.innerHTML += `<option value="${i}">${i}</option>`;
+  for (let i = 0; i <= 11; i++) transportSelect.innerHTML += `<option value="${i}">${i}</option>`;
+  for (let i = 0; i <= 2; i++) examSelect.innerHTML += `<option value="${i}">${i}</option>`;
+
+  tuitionSelect.addEventListener("change", calculateFees);
+  transportSelect.addEventListener("change", calculateFees);
+  examSelect.addEventListener("change", calculateFees);
+
+  calculateFees();
+}
+
+function calculateFees() {
+  const tuitionMonths = parseInt(document.getElementById("calcTuitionMonths").value);
+  const transportMonths = parseInt(document.getElementById("calcTransportMonths").value);
+  const examMonths = parseInt(document.getElementById("calcExamMonths").value);
+
+  const monthlyTuition = parseFloat(document.getElementById("monthlyTuition").innerText.replace("₹","")) || 0;
+  const transportFees = parseFloat(document.getElementById("transportFees").innerText.replace("₹","")) || 0;
+  const discount = parseFloat(document.getElementById("discount").innerText.replace("₹","")) || 0;
+  const examFeePerMonth = 500;
+
+  const total = (tuitionMonths * (monthlyTuition - discount)) + (transportMonths * transportFees) + (examMonths * examFeePerMonth);
+
+  const calcTotal = document.getElementById("calcTotal");
+  calcTotal.innerText = "₹" + total;
+  calcTotal.style.color = total>0 ? "red" : "green";
+
+  const payNowBtn = document.getElementById("payNowBtn");
+  payNowBtn.onclick = () => {
+    if(total <= 0){
+      alert("Please select months to calculate fees before paying.");
+      return;
+    }
+    if(confirm(`You are about to pay ₹${total} to Pinnacle Global School. Continue?`)){
+      const upiId = "pinnacleglobalschool.62697340@hdfcbank";
+      const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent("Pinnacle Global School")}&am=${total}&cu=INR&tn=${encodeURIComponent("School Fee Payment")}`;
+      window.location.href = upiLink;
+    }
+  };
+}
+
+// ------------------ FEE BALANCE PAYMENT ------------------
+function setupFeeBalancePayment(){
+  const payBalanceBtn = document.getElementById("payBalanceBtn");
+  if(!payBalanceBtn) return;
+
+  payBalanceBtn.addEventListener("click", () => {
+    let feeBalanceText = document.getElementById("feeBalance").innerText || "0";
+    feeBalanceText = feeBalanceText.replace(/[^0-9.]/g,'');
+    const feeBalance = parseFloat(feeBalanceText);
+
+    if(isNaN(feeBalance) || feeBalance <= 0){
+      alert("No balance to pay.");
+      return;
+    }
+
+    if(confirm(`You are about to pay your Fee Balance of ₹${feeBalance.toFixed(2)} to Pinnacle Global School. Continue?`)){
+      const upiId = "pinnacleglobalschool.62697340@hdfcbank";
+      const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent("Pinnacle Global School")}&am=${feeBalance.toFixed(2)}&cu=INR&tn=${encodeURIComponent("School Fee Payment")}`;
+      window.location.href = upiLink;
+    }
+  });
+}
+
+// ------------------ MOBILE LOGIN FIX ------------------
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("loginBtn").addEventListener("click", login);
+  document.getElementById("loginCode").addEventListener("keypress", function(e){
+    if(e.key === "Enter") login();
+  });
+});
