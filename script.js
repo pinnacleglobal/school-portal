@@ -1,7 +1,7 @@
-const sheetID = "1TBykyZx-eRMBDrRGBGGA8p_49iHlVDKN3wt9wijHJWM";
+const sheetID = "1Sy5uBZkjKpGnLdZp2sFuhFORhO1fRqCswfNYHRl73PM"; // Updated Sheet ID
 const apiKey = "AIzaSyB5VIy4kIySW7bVrjNYMpL5rkqZ7Oe758E";
 
-const masterSheet = encodeURIComponent("Master Data 25 (New)");
+const masterSheet = encodeURIComponent("Master Data 2026"); // Updated sheet name
 const feesSheet = encodeURIComponent("Fees Collection");
 const awSheet = encodeURIComponent("AW");
 
@@ -34,12 +34,20 @@ async function login() {
         // Master Data
         resp = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${masterSheet}?key=${apiKey}`);
         rows = (await resp.json()).values || [];
-        let studentClass = "", monthlyTuition = 0, tuitionMonths = 0, transportFees = 0, transportMonths = 0, prevRemain = 0, discount = 0;
+        let studentClass = "", monthlyTuition = 0, tuitionMonths = 0, transportFees = 0, transportMonths = 0, prevRemain = 0, discount = 0, examFee = 1000;
+
         for (let i = 1; i < rows.length; i++) {
-            let r = rows[i]; if (r[1] == admission) {
-                studentClass = r[13] || ""; monthlyTuition = parseFloat(r[4]) || 0; prevRemain = parseFloat(r[3]) || 0;
-                discount = parseFloat(r[5]) || 0; tuitionMonths = parseFloat(r[6]) || 0;
-                transportFees = parseFloat(r[7]) || 0; transportMonths = parseFloat(r[8]) || 0; break;
+            let r = rows[i]; 
+            if (r[1] == admission) {
+                studentClass = r[14] || ""; // Column O for class
+                monthlyTuition = parseFloat(r[4]) || 0; 
+                prevRemain = parseFloat(r[3]) || 0;
+                discount = parseFloat(r[5]) || 0; 
+                tuitionMonths = parseFloat(r[6]) || 0;
+                transportFees = parseFloat(r[7]) || 0; 
+                transportMonths = parseFloat(r[8]) || 0;
+                examFee = parseFloat(r[9]) || 1000; // Column J for exam fee
+                break;
             }
         }
 
@@ -56,22 +64,25 @@ async function login() {
         // Fees Collection
         resp = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${feesSheet}?key=${apiKey}`);
         rows = (await resp.json()).values || [];
-        let table = "", cards = "", totalPaid = 0, examFee = 1000;
+        let table = "", cards = "", totalPaid = 0;
 
         for (let i = 1; i < rows.length; i++) {
-            let r = rows[i]; if (r[2] == admission) {
+            let r = rows[i]; 
+            if (r[2] == admission) {
                 let date = r[1] || "", slip = r[0] || "", amount = parseFloat(r[5]) || 0;
                 let feeType = r[6] || "", session = r[7] || "", tMonths = r[8] || "", trMonths = r[9] || "", exMonths = r[10] || "", mode = r[11] || "";
-                if (session == "2025-26" && feeType.toLowerCase() == "monthly fees") totalPaid += amount;
+                if (session == "2026-27" && feeType.toLowerCase() == "monthly fees") totalPaid += amount;
 
                 table += `<tr><td>${date}</td><td>${slip}</td><td>₹${amount}</td><td>${feeType}</td><td>${session}</td><td>${tMonths}</td><td>${trMonths}</td><td>${exMonths}</td><td>${mode}</td></tr>`;
                 cards += `<div class="fee-card"><div><b>Date:</b> ${date}</div><div><b>Slip Number:</b> ${slip}</div><div><b>Amount Paid:</b> ₹${amount}</div><div><b>Fee Type:</b> ${feeType}</div><div><b>Session:</b> ${session}</div><div><b>Tuition Fee Months:</b> ${tMonths}</div><div><b>Transport Fee Months:</b> ${trMonths}</div><div><b>Exam Fee Months:</b> ${exMonths}</div><div><b>Payment Mode:</b> ${mode}</div></div>`;
             }
         }
 
+        // Total Fee & Balance
         let totalFee = ((monthlyTuition - discount) * tuitionMonths) + (transportFees * transportMonths) + examFee + prevRemain;
         let feeBalance = totalFee - totalPaid;
 
+        // Populate Fee Summary
         document.getElementById("feeTable").innerHTML = table;
         document.getElementById("feeCards").innerHTML = cards;
         document.getElementById("monthlyTuition").innerText = "₹" + monthlyTuition;
@@ -82,6 +93,9 @@ async function login() {
         document.getElementById("discount").innerText = "₹" + discount;
         document.getElementById("totalPaid").innerText = "₹" + totalPaid;
 
+        // Update Fee Summary Exam Fee dynamically
+        document.getElementById("examFee").innerText = "₹" + examFee;
+
         let bal = document.getElementById("feeBalance");
         bal.innerText = "₹" + feeBalance;
         bal.style.color = feeBalance > 0 ? "red" : "green";
@@ -90,7 +104,7 @@ async function login() {
         document.getElementById("loader").style.display = "none";
         document.getElementById("portal").style.display = "block";
 
-        populateFeeSelectors();
+        populateFeeSelectors(examFee);
         setupFeeBalancePayment();
         setupSendScreenshotButton();
 
@@ -104,27 +118,32 @@ async function login() {
 
 function logout() { location.reload(); }
 
-function populateFeeSelectors() {
+function populateFeeSelectors(examFee = 500) {
     const tuition = document.getElementById("calcTuitionMonths");
     const transport = document.getElementById("calcTransportMonths");
     const exam = document.getElementById("calcExamMonths");
     for (let i = 0; i <= 12; i++) tuition.innerHTML += `<option value="${i}">${i}</option>`;
     for (let i = 0; i <= 11; i++) transport.innerHTML += `<option value="${i}">${i}</option>`;
     for (let i = 0; i <= 2; i++) exam.innerHTML += `<option value="${i}">${i}</option>`;
-    tuition.addEventListener("change", calculateFees);
-    transport.addEventListener("change", calculateFees);
-    exam.addEventListener("change", calculateFees);
+    tuition.addEventListener("change", () => calculateFees(examFee));
+    transport.addEventListener("change", () => calculateFees(examFee));
+    exam.addEventListener("change", () => calculateFees(examFee));
 }
 
-function calculateFees() {
+function calculateFees(examFee = 500) {
     const t = parseInt(document.getElementById("calcTuitionMonths").value);
     const tr = parseInt(document.getElementById("calcTransportMonths").value);
     const ex = parseInt(document.getElementById("calcExamMonths").value);
+
     const monthly = parseFloat(document.getElementById("monthlyTuition").innerText.replace("₹", ""));
     const transport = parseFloat(document.getElementById("transportFees").innerText.replace("₹", ""));
     const discount = parseFloat(document.getElementById("discount").innerText.replace("₹", ""));
-    const examFee = 500;
-    let total = (t * (monthly - discount)) + (tr * transport) + (ex * examFee);
+
+    // Take half of the exam fee for Calculate Fees
+    let examFeePerMonth = examFee / 2;
+
+    let total = (t * (monthly - discount)) + (tr * transport) + (ex * examFeePerMonth);
+
     document.getElementById("calcTotal").innerText = "₹" + total;
 
     document.getElementById("payNowBtn").onclick = () => {
