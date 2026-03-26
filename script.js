@@ -60,6 +60,14 @@ async function login() {
         document.getElementById("mother").innerText = mother;
         document.getElementById("phone").innerText = phone;
         document.getElementById("address").innerText = address;
+        const photoUrl = r[28] || ""; // Column AC = index 28 (0-based)
+const img = document.getElementById("studentPhoto");
+if(photoUrl) {
+    img.src = photoUrl;
+    img.style.display = "inline-block";
+} else {
+    img.style.display = "none"; // hide if no photo
+}
 
         // Fees Collection
         resp = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${feesSheet}?key=${apiKey}`);
