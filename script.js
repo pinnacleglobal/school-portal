@@ -5,7 +5,7 @@ const feesSheet = encodeURIComponent("Fees Collection");
 const awSheet = encodeURIComponent("AW");
 
 // JSONP endpoint (from your Apps Script deployment)
-const appsScriptURL = "https://script.google.com/macros/s/AKfycbwtlKG5GVmefAR0_iHV6INCMCod8wKi1ki-PrnTnTGXm7gQn_IRZJOf5BkMlKzLCdks/exec";
+const appsScriptURL = "https://script.google.com/macros/s/AKfycbxNNzrxzpeZUcePolKKeD5zA-s0VbNUOp3udaZWmFeg_FvKuBuD0JlqIBJqtk3ngbgq/exec";
 
 // Login function
 async function login() {
