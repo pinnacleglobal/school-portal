@@ -64,16 +64,33 @@ async function login() {
         document.getElementById("address").innerText = address;
 
         // Show photo if available
-        const img = document.getElementById("studentPhoto");
-        if(photoUrl){
-            let finalUrl = photoUrl;
-            if(photoUrl.includes("drive.google.com")){
-                const match = photoUrl.match(/[-\w]{25,}/);
-                if(match) finalUrl = `https://drive.google.com/uc?export=view&id=${match[0]}`;
-            }
-            img.src = finalUrl;
-            img.style.display = "inline-block";
-        } else img.style.display = "none";
+       const img = document.getElementById("studentPhoto");
+if(photoUrl){
+    let finalUrl = photoUrl.trim();
+
+    // If Google Drive link, convert to direct view URL
+    if(finalUrl.includes("drive.google.com")){
+        let id = "";
+        const patterns = [
+            /\/file\/d\/([-\w]+)\//,                   // /file/d/FILEID/
+            /id=([-\w]+)/                              // id=FILEID
+        ];
+        for(const p of patterns){
+            const m = finalUrl.match(p);
+            if(m && m[1]){ id = m[1]; break; }
+        }
+        if(id) finalUrl = `https://drive.google.com/uc?export=view&id=${id}`;
+    }
+
+    // Show image
+    img.src = finalUrl + "&timestamp=" + new Date().getTime(); // avoid caching
+    img.style.display = "inline-block";
+
+    // Optional: add small glow
+    img.style.boxShadow = "0 0 15px 5px rgba(255,255,255,0.6)";
+} else {
+    img.style.display = "none";
+}
 
         // Fees Collection
         resp = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${feesSheet}?key=${apiKey}`);
