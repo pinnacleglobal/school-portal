@@ -68,21 +68,23 @@ async function login() {
         document.getElementById("address").innerText = address;
 
         // PHOTO LOGIC MOVED HERE
-        if (photoUrl && photoUrl.trim() !== "") {
-            let fileId = "";
-            if (photoUrl.includes("id=")) {
-                fileId = photoUrl.split("id=")[1].split("&")[0];
-            } else if (photoUrl.includes("/d/")) {
-                fileId = photoUrl.split("/d/")[1].split("/")[0];
-            }
-            if (fileId) {
-                const photoImg = document.getElementById("studentPhoto");
-                // Using the thumbnail link which is more reliable for direct display
-                photoImg.src = `https://lh3.googleusercontent.com/d/${fileId}`;
-                photoImg.style.display = "inline-block";
-            }
-        }
+       // Locate the Photo Logic inside your script.js login function
+if (photoUrl && photoUrl.trim() !== "") {
+    let fileId = "";
+    // Extracting ID from various Google Drive link formats
+    if (photoUrl.includes("id=")) {
+        fileId = photoUrl.split("id=")[1].split("&")[0];
+    } else if (photoUrl.includes("/d/")) {
+        fileId = photoUrl.split("/d/")[1].split("/")[0];
+    }
 
+    if (fileId) {
+        const photoImg = document.getElementById("studentPhoto");
+        // Using the universal 'uc' export link for direct image rendering
+        photoImg.src = `https://drive.google.com/uc?export=view&id=${fileId}`;
+        photoImg.style.display = "inline-block";
+    }
+}
         // 4. Fees Collection
         resp = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${feesSheet}?key=${apiKey}`);
         rows = (await resp.json()).values || [];
