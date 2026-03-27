@@ -10,13 +10,28 @@ async function login() {
     if (!code) { alert("Enter Login Code"); return; }
 
     document.getElementById("loginBtn").disabled = true;
+   // Function to convert Google Drive "open" links to direct image links
+if (photoUrl) {
+    let directLink = photoUrl;
+    if (photoUrl.includes("id=")) {
+        let id = photoUrl.split("id=")[1].split("&")[0];
+        directLink = `https://lh3.googleusercontent.com/u/0/d/${id}`;
+    } else if (photoUrl.includes("/d/")) {
+        let id = photoUrl.split("/d/")[1].split("/")[0];
+        directLink = `https://lh3.googleusercontent.com/u/0/d/${id}`;
+    }
+    
+    const photoImg = document.getElementById("studentPhoto");
+    photoImg.src = directLink;
+    photoImg.style.display = "inline-block";
+}
     document.getElementById("loader").style.display = "block";
 
     try {
         // AW Sheet
         let resp = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${awSheet}?key=${apiKey}`);
         let rows = (await resp.json()).values || [];
-        let admission = "", studentName = "", father = "", mother = "", phone = "", address = "";
+        let admission = "", studentName = "", father = "", mother = "", phone = "", address = "", photoUrl = "";
         let loginBlocked = false;
 
         for (let i = 1; i < rows.length; i++) {
@@ -24,7 +39,8 @@ async function login() {
             if (r[29] && r[29].trim() == code) {
                 if (r[31] && r[31].toUpperCase() == "TRUE") { loginBlocked = true; break; }
                 admission = r[1] || ""; studentName = r[3] || ""; father = r[6] || "";
-                mother = r[5] || ""; phone = r[22] || ""; address = r[7] || ""; break;
+                mother = r[5] || ""; phone = r[22] || ""; address = r[7] || ""; photoUrl = r[28] || ""; // Column AC is index 28
+                break;
             }
         }
 
