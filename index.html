@@ -230,14 +230,20 @@ Loading Student Data...
 
 <div id="portal" style="display:none">
 
-<div class="profile" style="text-align:center;background:#0b3d91;color:white;">
-<h2 id="welcomeName"></h2>
-</div>
-<div class="profile" style="text-align:center;background:#0b3d91;color:white;">
-    <h2 id="welcomeName"></h2>
-    <img id="studentPhoto" src="" alt="Student Photo" style="display:none; width:120px; height:120px; border-radius:50%; border:3px solid white; margin-bottom:10px; object-fit:cover;">
-</div>
-<div class="section-title">Student Details</div>
+    <div class="profile" style="text-align:center;background:#0b3d91;color:white;">
+        <img id="studentPhoto" src="" alt="Student Photo" style="display:none; width:120px; height:120px; border-radius:50%; border:3px solid white; margin-bottom:10px; object-fit:cover;">
+        <h2 id="welcomeName" style="margin: 10px 0;"></h2>
+    </div>
+
+    <div class="section-title">Student Details</div>
+    ```
+
+### Key Changes Made:
+* **Variable Scope:** Fixed the crash by moving the photo code inside the `try` block after `photoUrl` is defined from the sheet.
+* **Photo Source URL:** Changed the URL format to `lh3.googleusercontent.com/d/ID`. This is the most reliable way to display Google Drive images in an HTML tag.
+* **HTML Cleanup:** Removed the duplicate welcome header and placed the image above the name for a better "Profile" look.
+
+**Would you like me to add a placeholder image in case the student doesn't have a photo in the sheet?**
 
 <div class="profile">
 <div class="info"><span class="label">Student Name :</span> <span id="studentName"></span></div>
