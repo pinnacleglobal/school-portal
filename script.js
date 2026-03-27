@@ -67,11 +67,9 @@ async function login() {
         document.getElementById("phone").innerText = phone;
         document.getElementById("address").innerText = address;
 
-        // PHOTO LOGIC MOVED HERE
-       // Locate the Photo Logic inside your script.js login function
+        // --- PHOTO LOGIC ---
 if (photoUrl && photoUrl.trim() !== "") {
     let fileId = "";
-    // Extracting ID from various Google Drive link formats
     if (photoUrl.includes("id=")) {
         fileId = photoUrl.split("id=")[1].split("&")[0];
     } else if (photoUrl.includes("/d/")) {
@@ -80,9 +78,16 @@ if (photoUrl && photoUrl.trim() !== "") {
 
     if (fileId) {
         const photoImg = document.getElementById("studentPhoto");
-        // Using the universal 'uc' export link for direct image rendering
-        photoImg.src = `https://drive.google.com/uc?export=view&id=${fileId}`;
-        photoImg.style.display = "inline-block";
+        // This is the most reliable "Direct Link" for Google Drive images in 2026
+        photoImg.src = `https://lh3.googleusercontent.com/u/0/d/${fileId}`;
+        
+        // Ensure it displays below by making it a block element
+        photoImg.style.display = "inline-block"; 
+        
+        // Fallback: If the link above fails, try the older thumbnail format
+        photoImg.onerror = function() {
+            this.src = `https://drive.google.com/thumbnail?id=${fileId}&sz=w500`;
+        };
     }
 }
         // 4. Fees Collection
